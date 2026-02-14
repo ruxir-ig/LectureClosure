@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { onAuthStateChange, getSession, getTeacherProfile, signOut as authSignOut } from '../services/authService';
+import { onAuthStateChange, getSession, getTeacherProfile, signOut as authSignOut, resetPassword, updatePassword, updateProfile } from '../services/authService';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 const AuthContext = createContext({});
 
@@ -15,10 +16,18 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isDemoMode, setIsDemoMode] = useState(!isSupabaseConfigured);
 
     useEffect(() => {
         // Check initial session
         const initAuth = async () => {
+            if (!isSupabaseConfigured) {
+                // Demo mode - no authentication
+                setIsDemoMode(true);
+                setLoading(false);
+                return;
+            }
+
             const { session } = await getSession();
             if (session?.user) {
                 setUser(session.user);
@@ -32,6 +41,10 @@ export const AuthProvider = ({ children }) => {
 
         // Subscribe to auth changes
         const { data: { subscription } } = onAuthStateChange(async (event, session) => {
+            if (!isSupabaseConfigured) {
+                return;
+            }
+
             if (session?.user) {
                 setUser(session.user);
                 const { profile } = await getTeacherProfile(session.user.id);
@@ -54,12 +67,35 @@ export const AuthProvider = ({ children }) => {
         setProfile(null);
     };
 
+    const handleResetPassword = async (email) => {
+        return await resetPassword(email);
+    };
+
+    const handleUpdatePassword = async (newPassword) => {
+        return await updatePassword(newPassword);
+    };
+
+    const handleUpdateProfile = async (updates) => {
+        if (!user) {
+            return { profile: null, error: 'No user logged in' };
+        }
+        const result = await updateProfile(user.id, updates);
+        if (result.profile) {
+            setProfile(result.profile);
+        }
+        return result;
+    };
+
     const value = {
         user,
         profile,
         loading,
         signOut,
         isAuthenticated: !!user,
+        isDemoMode,
+        resetPassword: handleResetPassword,
+        updatePassword: handleUpdatePassword,
+        updateProfile: handleUpdateProfile,
     };
 
     return (

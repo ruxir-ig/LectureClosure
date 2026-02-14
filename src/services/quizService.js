@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 /**
  * Create a new quiz and save to Supabase
@@ -6,6 +6,11 @@ import { supabase } from '../lib/supabase';
  * @returns {Promise<{id: string} | null>}
  */
 export async function createQuiz({ title, questions, timeLimit = 600, teacherId = null }) {
+    if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured. Quiz will not be saved.');
+        return null;
+    }
+
     const insertData = {
         title,
         questions,
@@ -37,6 +42,11 @@ export async function createQuiz({ title, questions, timeLimit = 600, teacherId 
  * @returns {Promise<Object | null>}
  */
 export async function getQuiz(id) {
+    if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured. Cannot fetch quiz.');
+        return null;
+    }
+
     const { data, error } = await supabase
         .from('quizzes')
         .select('*')
@@ -57,6 +67,11 @@ export async function getQuiz(id) {
  * @returns {Promise<Object | null>}
  */
 export async function saveAttempt({ quizId, studentName, score, total, timeTaken }) {
+    if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured. Attempt will not be saved.');
+        return null;
+    }
+
     const { data, error } = await supabase
         .from('attempts')
         .insert([
@@ -85,6 +100,11 @@ export async function saveAttempt({ quizId, studentName, score, total, timeTaken
  * @returns {Promise<Array>}
  */
 export async function getLeaderboard(quizId) {
+    if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured. Returning empty leaderboard.');
+        return [];
+    }
+
     const { data, error } = await supabase
         .from('attempts')
         .select('*')
@@ -115,6 +135,11 @@ export function getQuizShareUrl(quizId) {
  * @returns {Promise<Array>}
  */
 export async function getTeacherQuizzes(teacherId) {
+    if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured. Returning empty quizzes list.');
+        return [];
+    }
+
     const { data, error } = await supabase
         .from('quizzes')
         .select('*')
@@ -135,6 +160,11 @@ export async function getTeacherQuizzes(teacherId) {
  * @returns {Promise<{totalQuizzes: number, totalAttempts: number}>}
  */
 export async function getTeacherStats(teacherId) {
+    if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured. Returning zero stats.');
+        return { totalQuizzes: 0, totalAttempts: 0 };
+    }
+
     // Get quizzes
     const { data: quizzes, error: quizError } = await supabase
         .from('quizzes')
@@ -167,4 +197,55 @@ export async function getTeacherStats(teacherId) {
         totalQuizzes: quizIds.length,
         totalAttempts: count || 0
     };
+}
+
+/**
+ * Update a quiz
+ * @param {string} quizId - Quiz ID
+ * @param {Object} updates - Fields to update
+ * @returns {Promise<Object | null>}
+ */
+export async function updateQuiz(quizId, updates) {
+    if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured. Quiz will not be updated.');
+        return null;
+    }
+
+    const { data, error } = await supabase
+        .from('quizzes')
+        .update(updates)
+        .eq('id', quizId)
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error updating quiz:', error);
+        return null;
+    }
+
+    return data;
+}
+
+/**
+ * Delete a quiz
+ * @param {string} quizId - Quiz ID
+ * @returns {Promise<boolean>}
+ */
+export async function deleteQuiz(quizId) {
+    if (!isSupabaseConfigured) {
+        console.warn('Supabase not configured. Quiz will not be deleted.');
+        return false;
+    }
+
+    const { error } = await supabase
+        .from('quizzes')
+        .delete()
+        .eq('id', quizId);
+
+    if (error) {
+        console.error('Error deleting quiz:', error);
+        return false;
+    }
+
+    return true;
 }
