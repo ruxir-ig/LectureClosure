@@ -33,7 +33,6 @@ const Signup = () => {
             setError(error);
         } else if (user) {
             setSuccess(true);
-            // Redirect after showing success message
             setTimeout(() => navigate('/dashboard'), 2000);
         }
     };
@@ -42,40 +41,41 @@ const Signup = () => {
         return (
             <div style={{
                 minHeight: '100vh',
-                background: 'linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 100%)',
+                background: 'var(--bg-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '2rem',
             }}>
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    style={{ textAlign: 'center', maxWidth: '400px' }}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    style={{ textAlign: 'center', maxWidth: '380px' }}
                 >
-                    <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.2, type: 'spring' }}
-                        style={{
-                            width: '80px',
-                            height: '80px',
-                            background: 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            margin: '0 auto 1.5rem',
-                            boxShadow: '0 8px 24px rgba(34, 197, 94, 0.3)',
-                        }}
-                    >
-                        <CheckCircle size={40} style={{ color: 'white' }} />
-                    </motion.div>
-                    <h1 style={{ fontSize: '1.75rem', fontWeight: '800', marginBottom: '0.5rem', color: '#16A34A' }}>
-                        Account Created!
+                    <div style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '6px',
+                        background: 'var(--success-muted)',
+                        border: '1px solid var(--success)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 1.5rem',
+                    }}>
+                        <CheckCircle size={22} style={{ color: 'var(--success)' }} />
+                    </div>
+                    <h1 style={{
+                        fontSize: '1.75rem',
+                        fontFamily: 'var(--font-display)',
+                        fontWeight: '400',
+                        color: 'var(--text-primary)',
+                        marginBottom: '0.5rem',
+                    }}>
+                        Account created
                     </h1>
-                    <p style={{ color: '#6B7280', marginBottom: '1rem' }}>
-                        Welcome aboard! Redirecting to dashboard...
+                    <p style={{ color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
+                        Redirecting to dashboard...
                     </p>
                 </motion.div>
             </div>
@@ -85,219 +85,182 @@ const Signup = () => {
     return (
         <div style={{
             minHeight: '100vh',
-            background: 'linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 100%)',
+            background: 'var(--bg-primary)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '2rem',
         }}>
             <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                style={{ maxWidth: '420px', width: '100%' }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                style={{ maxWidth: '380px', width: '100%' }}
             >
-                {/* Card */}
-                <div style={{
-                    background: 'white',
-                    borderRadius: '24px',
-                    padding: '2.5rem',
-                    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.08)',
-                    border: '1px solid #E5E7EB',
-                }}>
-                    {/* Header */}
-                    <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                        <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 0.2, type: 'spring' }}
-                            style={{
-                                width: '64px',
-                                height: '64px',
-                                background: 'linear-gradient(135deg, #4361EE 0%, #7C3AED 100%)',
-                                borderRadius: '16px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '0 auto 1.5rem',
-                                boxShadow: '0 8px 24px rgba(67, 97, 238, 0.3)',
-                            }}
-                        >
-                            <UserPlus size={28} style={{ color: 'white' }} />
-                        </motion.div>
-                        <h1 style={{ fontSize: '1.75rem', fontWeight: '800', marginBottom: '0.5rem', fontFamily: 'var(--font-display)' }}>
-                            Create Account
-                        </h1>
-                        <p style={{ color: '#6B7280' }}>
-                            Sign up as a teacher to start creating quizzes
-                        </p>
-                    </div>
-
-                    {/* Error Alert */}
-                    {error && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            style={{
-                                background: '#FEF2F2',
-                                border: '1px solid #FECACA',
-                                borderRadius: '12px',
-                                padding: '1rem',
-                                marginBottom: '1.5rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.75rem',
-                            }}
-                        >
-                            <AlertCircle size={20} style={{ color: '#EF4444', flexShrink: 0 }} />
-                            <span style={{ color: '#DC2626', fontSize: '0.875rem' }}>{error}</span>
-                        </motion.div>
-                    )}
-
-                    {/* Form */}
-                    <form onSubmit={handleSubmit}>
-                        {/* Full Name */}
-                        <div style={{ marginBottom: '1.25rem' }}>
-                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#4B5563', marginBottom: '0.5rem' }}>
-                                Full Name
-                            </label>
-                            <div style={{ position: 'relative' }}>
-                                <User size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
-                                <input
-                                    type="text"
-                                    value={fullName}
-                                    onChange={(e) => setFullName(e.target.value)}
-                                    placeholder="Prof. John Smith"
-                                    required
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.875rem 1rem 0.875rem 2.75rem',
-                                        borderRadius: '12px',
-                                        border: '2px solid #E5E7EB',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        transition: 'border-color 0.2s',
-                                    }}
-                                    onFocus={(e) => e.target.style.borderColor = '#4361EE'}
-                                    onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Email */}
-                        <div style={{ marginBottom: '1.25rem' }}>
-                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#4B5563', marginBottom: '0.5rem' }}>
-                                Email
-                            </label>
-                            <div style={{ position: 'relative' }}>
-                                <Mail size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="teacher@school.edu"
-                                    required
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.875rem 1rem 0.875rem 2.75rem',
-                                        borderRadius: '12px',
-                                        border: '2px solid #E5E7EB',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        transition: 'border-color 0.2s',
-                                    }}
-                                    onFocus={(e) => e.target.style.borderColor = '#4361EE'}
-                                    onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Password */}
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#4B5563', marginBottom: '0.5rem' }}>
-                                Password
-                            </label>
-                            <div style={{ position: 'relative' }}>
-                                <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Min. 6 characters"
-                                    required
-                                    minLength={6}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.875rem 3rem 0.875rem 2.75rem',
-                                        borderRadius: '12px',
-                                        border: '2px solid #E5E7EB',
-                                        fontSize: '1rem',
-                                        outline: 'none',
-                                        transition: 'border-color 0.2s',
-                                    }}
-                                    onFocus={(e) => e.target.style.borderColor = '#4361EE'}
-                                    onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    style={{
-                                        position: 'absolute',
-                                        right: '1rem',
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                        background: 'none',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        padding: 0,
-                                    }}
-                                >
-                                    {showPassword ? <EyeOff size={18} style={{ color: '#9CA3AF' }} /> : <Eye size={18} style={{ color: '#9CA3AF' }} />}
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Submit Button */}
-                        <motion.button
-                            type="submit"
-                            disabled={loading}
-                            whileHover={{ scale: loading ? 1 : 1.02 }}
-                            whileTap={{ scale: loading ? 1 : 0.98 }}
-                            className="btn btn-primary"
-                            style={{
-                                width: '100%',
-                                padding: '1rem',
-                                fontSize: '1rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '0.5rem',
-                                opacity: loading ? 0.7 : 1,
-                                cursor: loading ? 'not-allowed' : 'pointer',
-                            }}
-                        >
-                            {loading ? (
-                                <>
-                                    <Loader2 size={20} style={{ animation: 'spin 1s linear infinite' }} />
-                                    Creating account...
-                                </>
-                            ) : (
-                                <>
-                                    <UserPlus size={20} />
-                                    Create Account
-                                </>
-                            )}
-                        </motion.button>
-                    </form>
-
-                    {/* Login Link */}
-                    <p style={{ textAlign: 'center', marginTop: '1.5rem', color: '#6B7280', fontSize: '0.875rem' }}>
-                        Already have an account?{' '}
-                        <Link to="/login" style={{ color: '#4361EE', fontWeight: '600', textDecoration: 'none' }}>
-                            Sign in
-                        </Link>
+                {/* Header */}
+                <div style={{ marginBottom: '2.5rem' }}>
+                    <p style={{
+                        fontSize: '0.6875rem',
+                        fontWeight: '600',
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        color: 'var(--text-dim)',
+                        marginBottom: '0.75rem',
+                    }}>
+                        Get Started
+                    </p>
+                    <h1 style={{
+                        fontSize: '2rem',
+                        fontFamily: 'var(--font-display)',
+                        fontWeight: '400',
+                        color: 'var(--text-primary)',
+                        letterSpacing: '-0.01em',
+                        marginBottom: '0.5rem',
+                    }}>
+                        Create account
+                    </h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
+                        Sign up as a teacher to start creating quizzes.
                     </p>
                 </div>
+
+                {/* Error */}
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        style={{
+                            background: 'var(--error-muted)',
+                            border: '1px solid var(--error)',
+                            borderRadius: '4px',
+                            padding: '0.75rem 1rem',
+                            marginBottom: '1.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.625rem',
+                        }}
+                    >
+                        <AlertCircle size={15} style={{ color: 'var(--error)', flexShrink: 0 }} />
+                        <span style={{ color: 'var(--error)', fontSize: '0.8125rem' }}>{error}</span>
+                    </motion.div>
+                )}
+
+                {/* Form */}
+                <form onSubmit={handleSubmit}>
+                    <div style={{ marginBottom: '1rem' }}>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '0.75rem',
+                            fontWeight: '600',
+                            color: 'var(--text-muted)',
+                            marginBottom: '0.375rem',
+                        }}>
+                            Full Name
+                        </label>
+                        <input
+                            type="text"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            placeholder="Prof. John Smith"
+                            required
+                            style={{ width: '100%', fontSize: '0.875rem' }}
+                        />
+                    </div>
+
+                    <div style={{ marginBottom: '1rem' }}>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '0.75rem',
+                            fontWeight: '600',
+                            color: 'var(--text-muted)',
+                            marginBottom: '0.375rem',
+                        }}>
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="teacher@school.edu"
+                            required
+                            style={{ width: '100%', fontSize: '0.875rem' }}
+                        />
+                    </div>
+
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{
+                            display: 'block',
+                            fontSize: '0.75rem',
+                            fontWeight: '600',
+                            color: 'var(--text-muted)',
+                            marginBottom: '0.375rem',
+                        }}>
+                            Password
+                        </label>
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Min. 6 characters"
+                                required
+                                minLength={6}
+                                style={{ width: '100%', paddingRight: '2.5rem', fontSize: '0.875rem' }}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '0.75rem',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    padding: 0,
+                                    color: 'var(--text-dim)',
+                                }}
+                            >
+                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="btn btn-primary"
+                        style={{
+                            width: '100%',
+                            padding: '0.875rem',
+                            fontSize: '0.875rem',
+                            opacity: loading ? 0.6 : 1,
+                            cursor: loading ? 'not-allowed' : 'pointer',
+                        }}
+                    >
+                        {loading ? (
+                            <>
+                                <Loader2 size={16} className="animate-spin" />
+                                Creating account...
+                            </>
+                        ) : (
+                            'Create Account'
+                        )}
+                    </button>
+                </form>
+
+                <p style={{
+                    textAlign: 'center',
+                    marginTop: '1.5rem',
+                    color: 'var(--text-dim)',
+                    fontSize: '0.8125rem',
+                }}>
+                    Already have an account?{' '}
+                    <Link to="/login" style={{ color: 'var(--accent)', fontWeight: '600' }}>
+                        Sign in
+                    </Link>
+                </p>
             </motion.div>
         </div>
     );

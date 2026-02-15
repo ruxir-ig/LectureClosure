@@ -5,19 +5,18 @@ const CircularTimer = ({
     timeLeft,
     totalTime = 600,
     size = 120,
-    strokeWidth = 8,
+    strokeWidth = 3,
 }) => {
     const radius = (size - strokeWidth) / 2;
     const circumference = radius * 2 * Math.PI;
     const progress = timeLeft / totalTime;
     const offset = circumference - (progress * circumference);
 
-    // Color transitions based on time remaining
     const getColor = () => {
-        if (timeLeft <= 30) return '#EF4444'; // Red - critical
-        if (timeLeft <= 60) return '#F59E0B'; // Orange - warning
-        if (timeLeft <= 120) return '#EAB308'; // Yellow - caution
-        return '#22C55E'; // Green - plenty of time
+        if (timeLeft <= 30) return 'var(--error)';
+        if (timeLeft <= 60) return 'var(--warning)';
+        if (timeLeft <= 120) return 'var(--warning)';
+        return 'var(--text-muted)';
     };
 
     const formatTime = (seconds) => {
@@ -29,21 +28,20 @@ const CircularTimer = ({
     const { mins, secs } = formatTime(timeLeft);
     const color = getColor();
     const isCritical = timeLeft <= 30;
-    const isWarning = timeLeft <= 60;
 
     return (
         <div style={{ position: 'relative', width: size, height: size }}>
-            {/* Background circle */}
             <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+                {/* Track */}
                 <circle
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
                     fill="none"
-                    stroke="#F3F4F6"
+                    stroke="var(--border-primary)"
                     strokeWidth={strokeWidth}
                 />
-                {/* Progress circle */}
+                {/* Progress */}
                 <motion.circle
                     cx={size / 2}
                     cy={size / 2}
@@ -54,55 +52,48 @@ const CircularTimer = ({
                     strokeLinecap="round"
                     strokeDasharray={circumference}
                     initial={{ strokeDashoffset: 0 }}
-                    animate={{
-                        strokeDashoffset: offset,
-                        stroke: color,
-                    }}
+                    animate={{ strokeDashoffset: offset, stroke: color }}
                     transition={{ duration: 0.5, ease: 'easeOut' }}
-                    style={{
-                        filter: isCritical ? 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.5))' : 'none',
-                    }}
                 />
             </svg>
 
-            {/* Time display */}
-            <motion.div
-                animate={isCritical ? { scale: [1, 1.05, 1] } : {}}
-                transition={{ repeat: Infinity, duration: 0.5 }}
-                style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    textAlign: 'center',
-                }}
-            >
+            {/* Time Display */}
+            <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                textAlign: 'center',
+            }}>
                 <div style={{
-                    fontFamily: 'var(--font-mono, monospace)',
-                    fontSize: size * 0.28,
-                    fontWeight: 'bold',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: size * 0.24,
+                    fontWeight: '500',
                     color: color,
                     lineHeight: 1,
+                    letterSpacing: '-0.02em',
+                    fontVariantNumeric: 'tabular-nums',
                 }}>
                     {mins}:{secs}
                 </div>
                 <div style={{
-                    fontSize: size * 0.09,
-                    color: '#9CA3AF',
-                    fontWeight: 600,
+                    fontSize: size * 0.08,
+                    color: 'var(--text-dim)',
+                    fontWeight: '600',
                     textTransform: 'uppercase',
                     letterSpacing: '0.1em',
-                    marginTop: 4,
+                    marginTop: 3,
+                    fontFamily: 'var(--font-mono)',
                 }}>
-                    {isCritical ? 'HURRY!' : isWarning ? 'TIME LOW' : 'REMAINING'}
+                    {isCritical ? 'LOW' : 'REMAINING'}
                 </div>
-            </motion.div>
+            </div>
 
-            {/* Pulse effect for critical time */}
+            {/* Critical pulse ring */}
             {isCritical && (
                 <motion.div
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
-                    transition={{ repeat: Infinity, duration: 1 }}
+                    animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0, 0.4] }}
+                    transition={{ repeat: Infinity, duration: 1.2, ease: 'easeInOut' }}
                     style={{
                         position: 'absolute',
                         top: 0,
@@ -110,7 +101,7 @@ const CircularTimer = ({
                         width: size,
                         height: size,
                         borderRadius: '50%',
-                        border: `2px solid ${color}`,
+                        border: `1px solid ${color}`,
                     }}
                 />
             )}

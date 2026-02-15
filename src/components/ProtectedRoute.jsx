@@ -14,15 +14,14 @@ const ProtectedRoute = ({ children }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 100%)',
+                background: 'var(--bg-primary)',
             }}>
-                <Loader2 size={48} style={{ color: '#4361EE', animation: 'spin 1s linear infinite' }} />
+                <Loader2 size={24} style={{ color: 'var(--accent)' }} className="animate-spin" />
             </div>
         );
     }
 
     if (!isAuthenticated) {
-        // Redirect to login, but save the attempted URL
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 

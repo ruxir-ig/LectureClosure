@@ -1,306 +1,426 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, FileText, Users, BarChart2, Share2, Trash2, ExternalLink, TrendingUp, Clock, Sparkles, Calendar, ChevronRight, Loader2 } from 'lucide-react';
+import { Plus, Search, FileText, Users, BarChart2, Share2, Trash2, ExternalLink, Clock, ChevronRight, Loader2, LayoutDashboard, Zap, Settings, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import AnimatedCounter from '../components/AnimatedCounter';
 import { useAuth } from '../context/AuthContext';
 import { getTeacherQuizzes, getTeacherStats, getQuizShareUrl } from '../services/quizService';
 
 const Dashboard = () => {
     const { user, profile } = useAuth();
-    const [searchQuery, setSearchQuery] = useState('');
     const [quizzes, setQuizzes] = useState([]);
-    const [stats, setStats] = useState({ totalQuizzes: 0, totalAttempts: 0 });
+    const [stats, setStats] = useState({ totalQuizzes: 0, totalAttempts: 0, avgScore: 0 });
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
     useEffect(() => {
-        const loadData = async () => {
-            if (!user?.id) return;
-
-            setLoading(true);
-            const [quizzesData, statsData] = await Promise.all([
+        const fetchData = async () => {
+            if (!user) return;
+            const [q, s] = await Promise.all([
                 getTeacherQuizzes(user.id),
-                getTeacherStats(user.id)
+                getTeacherStats(user.id),
             ]);
-            setQuizzes(quizzesData);
-            setStats(statsData);
+            if (q) setQuizzes(q);
+            if (s) setStats(s);
             setLoading(false);
         };
-
-        loadData();
-    }, [user?.id]);
+        fetchData();
+    }, [user]);
 
     const filteredQuizzes = quizzes.filter(q =>
-        q.title.toLowerCase().includes(searchQuery.toLowerCase())
+        q.title?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const formatDate = (dateStr) => {
-        return new Date(dateStr).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        });
-    };
-
-    const statsCards = [
-        {
-            label: 'Total Quizzes',
-            value: stats.totalQuizzes,
-            icon: FileText,
-            gradient: 'linear-gradient(135deg, #4361EE 0%, #7C3AED 100%)',
-            bgLight: '#EEF2FF',
-        },
-        {
-            label: 'Total Attempts',
-            value: stats.totalAttempts,
-            icon: Users,
-            gradient: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
-            bgLight: '#F3E8FF',
-        },
+    const sidebarLinks = [
+        { icon: LayoutDashboard, label: 'Dashboard', active: true },
+        { icon: Zap, label: 'Create', href: '/create' },
+        { icon: BarChart2, label: 'Analytics' },
+        { icon: Settings, label: 'Settings' },
     ];
 
     if (loading) {
         return (
             <div style={{
                 minHeight: '100vh',
-                background: 'linear-gradient(180deg, #FAFBFC 0%, #FFFFFF 100%)',
+                background: 'var(--bg-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
             }}>
-                <Loader2 size={48} style={{ color: '#4361EE', animation: 'spin 1s linear infinite' }} />
+                <Loader2 size={24} style={{ color: 'var(--accent)' }} className="animate-spin" />
             </div>
         );
     }
 
     return (
-        <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #FAFBFC 0%, #FFFFFF 100%)', padding: '2rem 0 4rem' }}>
-            <div className="container" style={{ maxWidth: '1100px' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
 
-                {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1.5rem', marginBottom: '2.5rem' }}
-                >
-                    <div>
-                        <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: '800', marginBottom: '0.5rem', fontFamily: 'var(--font-display)' }}>
-                            Welcome back, {profile?.full_name?.split(' ')[0] || 'Professor'}!
-                        </h1>
-                        <p style={{ color: '#6B7280', fontSize: '1.125rem' }}>
-                            Here's what's happening with your quizzes.
-                        </p>
+            {/* ── Sidebar ── */}
+            <motion.aside
+                onMouseEnter={() => setSidebarExpanded(true)}
+                onMouseLeave={() => setSidebarExpanded(false)}
+                animate={{ width: sidebarExpanded ? 200 : 60 }}
+                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                className="desktop-header"
+                style={{
+                    borderRight: '1px solid var(--border-subtle)',
+                    background: 'var(--bg-secondary)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: '1.25rem 0',
+                    overflow: 'hidden',
+                    position: 'sticky',
+                    top: 0,
+                    height: '100vh',
+                    flexShrink: 0,
+                }}
+            >
+                <div>
+                    {sidebarLinks.map((link, idx) => {
+                        const Comp = link.href ? Link : 'div';
+                        return (
+                            <Comp
+                                key={idx}
+                                to={link.href}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.75rem',
+                                    padding: '0.625rem 1.25rem',
+                                    margin: '2px 0.5rem',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    background: link.active ? 'var(--bg-card)' : 'transparent',
+                                    transition: 'background 150ms ease',
+                                    textDecoration: 'none',
+                                    whiteSpace: 'nowrap',
+                                }}
+                            >
+                                <link.icon
+                                    size={17}
+                                    strokeWidth={1.6}
+                                    style={{
+                                        color: link.active ? 'var(--text-primary)' : 'var(--text-dim)',
+                                        flexShrink: 0,
+                                    }}
+                                />
+                                <motion.span
+                                    animate={{ opacity: sidebarExpanded ? 1 : 0 }}
+                                    transition={{ duration: 0.15 }}
+                                    style={{
+                                        fontSize: '0.8125rem',
+                                        fontWeight: '500',
+                                        color: link.active ? 'var(--text-primary)' : 'var(--text-muted)',
+                                    }}
+                                >
+                                    {link.label}
+                                </motion.span>
+                            </Comp>
+                        );
+                    })}
+                </div>
+
+                {/* User at bottom */}
+                <div style={{
+                    padding: '0 1.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                }}>
+                    <div style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '4px',
+                        background: 'var(--accent)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '0.6875rem',
+                        fontWeight: '700',
+                        color: '#fff',
+                        flexShrink: 0,
+                    }}>
+                        {profile?.full_name?.[0]?.toUpperCase() || 'U'}
                     </div>
-                    <Link
-                        to="/create"
-                        className="btn btn-primary"
+                    <motion.span
+                        animate={{ opacity: sidebarExpanded ? 1 : 0 }}
+                        transition={{ duration: 0.15 }}
                         style={{
-                            padding: '1rem 1.75rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            boxShadow: '0 8px 24px rgba(67, 97, 238, 0.25)',
+                            fontSize: '0.75rem',
+                            fontWeight: '500',
+                            color: 'var(--text-muted)',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
                         }}
                     >
-                        <Plus size={20} />
-                        Create New Quiz
+                        {profile?.full_name || 'Teacher'}
+                    </motion.span>
+                </div>
+            </motion.aside>
+
+            {/* ── Main Content ── */}
+            <main style={{ flex: 1, padding: '2rem 2.5rem', minWidth: 0 }}>
+
+                {/* Top Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        marginBottom: '2.5rem',
+                    }}
+                >
+                    <div>
+                        <p style={{
+                            fontSize: '0.6875rem',
+                            fontWeight: '600',
+                            letterSpacing: '0.14em',
+                            textTransform: 'uppercase',
+                            color: 'var(--text-dim)',
+                            marginBottom: '0.5rem',
+                        }}>
+                            Dashboard
+                        </p>
+                        <h1 style={{
+                            fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                            fontFamily: 'var(--font-display)',
+                            fontWeight: '400',
+                            color: 'var(--text-primary)',
+                        }}>
+                            Welcome back{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}.
+                        </h1>
+                    </div>
+                    <Link to="/create" className="btn btn-primary" style={{ padding: '0.625rem 1.25rem', fontSize: '0.8125rem' }}>
+                        <Plus size={16} />
+                        New Quiz
                     </Link>
                 </motion.div>
 
-                {/* Stats Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
-                    {statsCards.map((stat, idx) => (
+                {/* Stats Row */}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                    gap: '1px',
+                    background: 'var(--border-subtle)',
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                    marginBottom: '2.5rem',
+                }}>
+                    {[
+                        { icon: FileText, label: 'Quizzes', value: stats.totalQuizzes },
+                        { icon: Users, label: 'Total Attempts', value: stats.totalAttempts },
+                        { icon: BarChart2, label: 'Avg Score', value: `${stats.avgScore}%` },
+                    ].map((stat, idx) => (
                         <motion.div
                             key={idx}
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.1 }}
-                            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                            transition={{ delay: idx * 0.08 }}
                             style={{
-                                background: 'white',
-                                borderRadius: '20px',
                                 padding: '1.5rem',
-                                border: '1px solid #E5E7EB',
-                                boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '1.25rem',
+                                background: 'var(--bg-card)',
                             }}
                         >
+                            <stat.icon size={15} style={{ color: 'var(--text-dim)', marginBottom: '0.75rem' }} />
                             <div style={{
-                                width: '56px',
-                                height: '56px',
-                                borderRadius: '16px',
-                                background: stat.gradient,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: '0 8px 16px rgba(67, 97, 238, 0.2)',
+                                fontSize: '1.5rem',
+                                fontWeight: '600',
+                                fontFamily: 'var(--font-mono)',
+                                fontVariantNumeric: 'tabular-nums',
+                                color: 'var(--text-primary)',
+                                marginBottom: '0.125rem',
                             }}>
-                                <stat.icon size={24} style={{ color: 'white' }} />
+                                {stat.value}
                             </div>
-                            <div>
-                                <p style={{ fontSize: '0.875rem', color: '#6B7280', marginBottom: '0.25rem' }}>{stat.label}</p>
-                                <p style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)' }}>
-                                    <AnimatedCounter value={stat.value} />
-                                </p>
+                            <div style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', fontWeight: '500' }}>
+                                {stat.label}
                             </div>
                         </motion.div>
                     ))}
                 </div>
 
-                {/* Quizzes Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-                        <h2 style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-display)' }}>
-                            Your Quizzes
-                        </h2>
-                        <div style={{ position: 'relative' }}>
-                            <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
-                            <input
-                                type="text"
-                                placeholder="Search quizzes..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                style={{
-                                    padding: '0.75rem 1rem 0.75rem 2.75rem',
-                                    borderRadius: '12px',
-                                    border: '2px solid #E5E7EB',
-                                    width: '280px',
-                                    fontSize: '0.875rem',
-                                    outline: 'none',
-                                    transition: 'border-color 0.2s',
-                                }}
-                                onFocus={(e) => e.target.style.borderColor = '#4361EE'}
-                                onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
-                            />
-                        </div>
+                {/* Search & Label */}
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '1.25rem',
+                }}>
+                    <p style={{
+                        fontSize: '0.8125rem',
+                        fontWeight: '600',
+                        color: 'var(--text-secondary)',
+                    }}>
+                        Your Quizzes
+                    </p>
+                    <div style={{ position: 'relative' }}>
+                        <Search size={14} style={{
+                            position: 'absolute',
+                            left: '10px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            color: 'var(--text-dim)',
+                        }} />
+                        <input
+                            type="text"
+                            placeholder="Search quizzes..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{
+                                paddingLeft: '32px',
+                                padding: '0.5rem 0.75rem 0.5rem 32px',
+                                fontSize: '0.75rem',
+                                width: '220px',
+                            }}
+                        />
                     </div>
+                </div>
 
-                    {filteredQuizzes.length === 0 ? (
-                        <div style={{
-                            background: 'white',
-                            borderRadius: '20px',
-                            padding: '4rem 2rem',
-                            textAlign: 'center',
-                            border: '1px solid #E5E7EB',
-                        }}>
-                            <div style={{
-                                width: '80px',
-                                height: '80px',
-                                background: '#EEF2FF',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '0 auto 1.5rem',
-                            }}>
-                                <FileText size={32} style={{ color: '#4361EE' }} />
-                            </div>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem' }}>
-                                {searchQuery ? 'No quizzes found' : 'No quizzes yet'}
-                            </h3>
-                            <p style={{ color: '#6B7280', marginBottom: '1.5rem' }}>
-                                {searchQuery ? 'Try a different search term' : 'Create your first quiz to get started!'}
-                            </p>
-                            {!searchQuery && (
-                                <Link to="/create" className="btn btn-primary" style={{ padding: '0.875rem 1.5rem' }}>
-                                    <Plus size={18} />
-                                    Create Quiz
-                                </Link>
-                            )}
-                        </div>
-                    ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            {filteredQuizzes.map((quiz, idx) => (
+                {/* Quiz Cards Grid */}
+                {filteredQuizzes.length === 0 ? (
+                    <div style={{
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-primary)',
+                        borderRadius: '6px',
+                        padding: '4rem 2rem',
+                        textAlign: 'center',
+                    }}>
+                        <FileText size={28} style={{ color: 'var(--text-dim)', marginBottom: '1rem' }} />
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                            No quizzes yet
+                        </p>
+                        <p style={{ color: 'var(--text-dim)', fontSize: '0.75rem', marginBottom: '2rem' }}>
+                            Create your first quiz to get started.
+                        </p>
+                        <Link to="/create" className="btn btn-primary" style={{ padding: '0.625rem 1.25rem', fontSize: '0.8125rem' }}>
+                            <Plus size={15} />
+                            Create Quiz
+                        </Link>
+                    </div>
+                ) : (
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                        gap: '1px',
+                        background: 'var(--border-subtle)',
+                        borderRadius: '6px',
+                        overflow: 'hidden',
+                    }}>
+                        {filteredQuizzes.map((quiz, idx) => {
+                            const questionsCount = quiz.questions?.length || 0;
+                            const createdAt = new Date(quiz.created_at);
+                            const timeAgo = Math.round((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+
+                            return (
                                 <motion.div
                                     key={quiz.id}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.05 }}
-                                    whileHover={{ backgroundColor: '#FAFBFC' }}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: idx * 0.04 }}
                                     style={{
-                                        background: 'white',
-                                        borderRadius: '16px',
-                                        padding: '1.25rem 1.5rem',
-                                        border: '1px solid #E5E7EB',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        flexWrap: 'wrap',
-                                        gap: '1rem',
-                                        transition: 'background-color 0.2s',
+                                        padding: '1.5rem',
+                                        background: 'var(--bg-card)',
+                                        transition: 'background 150ms ease',
+                                        cursor: 'pointer',
                                     }}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-card-hover)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-card)'}
                                 >
-                                    <div style={{ flex: 1, minWidth: '200px' }}>
-                                        <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.25rem' }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'flex-start',
+                                        marginBottom: '1rem',
+                                    }}>
+                                        <h3 style={{
+                                            fontSize: '0.9375rem',
+                                            fontWeight: '600',
+                                            fontFamily: 'var(--font-body)',
+                                            color: 'var(--text-primary)',
+                                            lineHeight: 1.4,
+                                            flex: 1,
+                                            paddingRight: '1rem',
+                                        }}>
                                             {quiz.title}
                                         </h3>
-                                        <p style={{ fontSize: '0.875rem', color: '#6B7280', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <Calendar size={14} />
-                                            {formatDate(quiz.created_at)}
-                                            <span style={{ margin: '0 0.5rem' }}>•</span>
-                                            {quiz.questions?.length || 0} questions
-                                        </p>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <button
-                                            onClick={() => navigator.clipboard.writeText(getQuizShareUrl(quiz.id))}
+                                        <Link
+                                            to={`/leaderboard/${quiz.id}`}
                                             style={{
-                                                padding: '0.5rem',
-                                                background: '#EEF2FF',
+                                                color: 'var(--text-dim)',
+                                                flexShrink: 0,
+                                            }}
+                                        >
+                                            <ChevronRight size={16} />
+                                        </Link>
+                                    </div>
+
+                                    <div style={{
+                                        display: 'flex',
+                                        gap: '1rem',
+                                        fontSize: '0.6875rem',
+                                        color: 'var(--text-dim)',
+                                        fontFamily: 'var(--font-mono)',
+                                    }}>
+                                        <span>{questionsCount} Q</span>
+                                        <span>{timeAgo === 0 ? 'Today' : `${timeAgo}d ago`}</span>
+                                    </div>
+
+                                    <div style={{
+                                        display: 'flex',
+                                        gap: '0.5rem',
+                                        marginTop: '1rem',
+                                    }}>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigator.clipboard.writeText(getQuizShareUrl(quiz.id));
+                                            }}
+                                            style={{
+                                                padding: '4px 10px',
+                                                fontSize: '0.625rem',
+                                                fontWeight: '600',
+                                                color: 'var(--accent)',
+                                                background: 'var(--accent-muted)',
                                                 border: 'none',
-                                                borderRadius: '8px',
+                                                borderRadius: '3px',
                                                 cursor: 'pointer',
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                justifyContent: 'center',
+                                                gap: '4px',
                                             }}
-                                            title="Copy share link"
                                         >
-                                            <Share2 size={16} style={{ color: '#4361EE' }} />
+                                            <Share2 size={10} />
+                                            Copy Link
                                         </button>
                                         <Link
                                             to={`/leaderboard/${quiz.id}`}
                                             style={{
-                                                padding: '0.5rem',
-                                                background: '#F0FDF4',
-                                                border: 'none',
-                                                borderRadius: '8px',
+                                                padding: '4px 10px',
+                                                fontSize: '0.625rem',
+                                                fontWeight: '600',
+                                                color: 'var(--text-muted)',
+                                                background: 'var(--bg-elevated)',
+                                                borderRadius: '3px',
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                justifyContent: 'center',
+                                                gap: '4px',
+                                                border: '1px solid var(--border-primary)',
                                             }}
-                                            title="View leaderboard"
                                         >
-                                            <BarChart2 size={16} style={{ color: '#22C55E' }} />
-                                        </Link>
-                                        <Link
-                                            to={`/quiz/${quiz.id}/start`}
-                                            style={{
-                                                padding: '0.5rem',
-                                                background: '#F3F4F6',
-                                                border: 'none',
-                                                borderRadius: '8px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                            }}
-                                            title="Preview quiz"
-                                        >
-                                            <ExternalLink size={16} style={{ color: '#6B7280' }} />
+                                            <BarChart2 size={10} />
+                                            Results
                                         </Link>
                                     </div>
                                 </motion.div>
-                            ))}
-                        </div>
-                    )}
-                </motion.div>
-            </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </main>
         </div>
     );
 };

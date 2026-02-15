@@ -1,336 +1,397 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Upload, Sparkles, Share2, Trophy, BarChart3, Download, MessageCircle, Users, Clock, Check, Star, GraduationCap, Zap, Play } from 'lucide-react';
+import { ArrowRight, Upload, Sparkles, Share2, Trophy, BarChart3, Users, Check, GraduationCap, Sun, Moon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import AnimatedCounter from '../components/AnimatedCounter';
-
-/*
- * 60-30-10 Color Rule:
- * 60% - Warm white/cream (#FDFBF7)
- * 30% - Soft sage green (#E8F0EC) + Light backgrounds
- * 10% - Deep teal accent (#2D7A6E) for CTAs, highlights
- */
+import { useTheme } from '../context/ThemeContext';
 
 const Landing = () => {
-    const accentPrimary = '#2D7A6E';    // Deep teal (10% - CTAs, highlights)
-    const accentLight = '#E8F0EC';       // Soft sage (30% - backgrounds)
-    const textPrimary = '#2C3E50';       // Warm charcoal
-    const textSecondary = '#5D6D7E';     // Muted blue-gray
-    const bgPrimary = '#FDFBF7';         // Warm cream white (60%)
-    const bgCard = '#FFFFFF';
-
+    const { theme, toggleTheme } = useTheme();
     const features = [
-        { icon: Trophy, title: "Live Leaderboards", desc: "Watch students compete in real-time with engaging rankings." },
-        { icon: BarChart3, title: "Smart Analytics", desc: "Detailed insights on student performance and progress." },
-        { icon: Share2, title: "One-Click Share", desc: "Send via WhatsApp, email, or Google Classroom instantly." },
-        { icon: Download, title: "Export Anywhere", desc: "Download as PDF, Word, or print-ready format." },
-        { icon: Users, title: "Teacher Dashboard", desc: "Manage all your quizzes and classes in one place." },
-        { icon: MessageCircle, title: "WhatsApp Ready", desc: "Built specifically for Indian classrooms." },
+        { icon: Upload, title: "Upload Anything", desc: "PDFs, PPTs, notes — any lecture content." },
+        { icon: Sparkles, title: "AI Generation", desc: "Intelligent MCQs with adaptive distractors." },
+        { icon: Share2, title: "Instant Share", desc: "One link. WhatsApp, email, or classroom." },
+        { icon: Trophy, title: "Live Rankings", desc: "Real-time leaderboards that drive engagement." },
+        { icon: BarChart3, title: "Deep Analytics", desc: "Question-level performance breakdowns." },
+        { icon: Users, title: "Unlimited Students", desc: "No cap on participants. Scale freely." },
     ];
 
     const testimonials = [
-        { name: "Priya Sharma", role: "Math Teacher, Delhi Public School", quote: "LectureClosure saves me 2+ hours every week. The leaderboard feature keeps my students motivated!", avatar: "PS" },
+        { name: "Priya Sharma", role: "Mathematics, Delhi Public School", quote: "LectureClosure saves me 2+ hours every week. The leaderboard keeps my students motivated.", avatar: "PS" },
         { name: "Rahul Mehta", role: "Science Faculty, Pune", quote: "Finally, a tool that understands Indian educators. The WhatsApp sharing is brilliant.", avatar: "RM" },
-        { name: "Anita Desai", role: "English Teacher, Mumbai", quote: "My class participation has doubled since I started using live quizzes. Parents love the reports!", avatar: "AD" },
+        { name: "Anita Desai", role: "English, Mumbai", quote: "My class participation has doubled since I started using live quizzes.", avatar: "AD" },
     ];
 
+    const stagger = {
+        hidden: {},
+        visible: { transition: { staggerChildren: 0.08 } }
+    };
+
+    const fadeUp = {
+        hidden: { opacity: 0, y: 16 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }
+    };
+
     return (
-        <div style={{ background: bgPrimary, minHeight: '100vh' }}>
+        <div style={{ background: 'var(--bg-primary)', minHeight: '100vh' }}>
 
-            {/* Hero Section - Modern Split Layout */}
-            <section style={{ padding: '5rem 2rem 4rem', maxWidth: '1200px', margin: '0 auto' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'center' }}>
+            {/* ── Hero ── */}
+            <section className="landing-hero" style={{
+                position: 'relative',
+                padding: '8rem 2rem 6rem',
+                maxWidth: '1200px',
+                margin: '0 auto',
+                overflow: 'hidden',
+            }}>
+                {/* Subtle Grid Background */}
+                <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundImage: `
+                        linear-gradient(var(--border-subtle) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px)
+                    `,
+                    backgroundSize: '80px 80px',
+                    opacity: 0.35,
+                    maskImage: 'radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 70%)',
+                    WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 70%)',
+                    pointerEvents: 'none',
+                }} />
 
-                    {/* Left: Content */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        {/* Eyebrow */}
-                        <div style={{
-                            fontSize: '0.75rem',
-                            fontWeight: '600',
-                            letterSpacing: '0.15em',
-                            textTransform: 'uppercase',
-                            color: accentPrimary,
-                            marginBottom: '1rem',
-                        }}>
-                            AI Quiz Generator for Teachers
-                        </div>
-
-                        {/* Headline */}
-                        <h1 style={{
-                            fontSize: 'clamp(2rem, 4.5vw, 3.25rem)',
-                            lineHeight: 1.1,
-                            fontFamily: 'var(--font-display)',
-                            fontWeight: '700',
-                            color: textPrimary,
-                            marginBottom: '1.25rem',
-                        }}>
-                            Create Quizzes<br />
-                            <span style={{ color: accentPrimary }}>in Seconds</span>
-                        </h1>
-
-                        {/* Description */}
-                        <p style={{
-                            fontSize: '1.0625rem',
-                            color: textSecondary,
-                            lineHeight: 1.7,
-                            marginBottom: '2rem',
-                            maxWidth: '420px',
-                        }}>
-                            Upload your notes, PPTs, or PDFs. Our AI generates engaging quizzes with live leaderboards—share with unlimited students for free.
-                        </p>
-
-                        {/* CTAs */}
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.875rem', marginBottom: '2rem' }}>
-                            <Link
-                                to="/create"
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    fontSize: '0.9375rem',
-                                    padding: '0.9rem 1.75rem',
-                                    background: accentPrimary,
-                                    color: 'white',
-                                    borderRadius: '10px',
-                                    textDecoration: 'none',
-                                    fontWeight: '600',
-                                    transition: 'all 0.2s ease',
-                                }}
-                            >
-                                <Zap size={18} />
-                                Create Quiz
-                            </Link>
-                            <Link
-                                to="/dashboard"
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    fontSize: '0.9375rem',
-                                    padding: '0.9rem 1.5rem',
-                                    background: 'transparent',
-                                    color: textPrimary,
-                                    border: `1.5px solid #D5D9DD`,
-                                    borderRadius: '10px',
-                                    textDecoration: 'none',
-                                    fontWeight: '500',
-                                }}
-                            >
-                                <Play size={16} />
-                                See Demo
-                            </Link>
-                        </div>
-
-                        {/* Trust Indicator */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', color: textSecondary, fontSize: '0.8125rem' }}>
-                            <div style={{ display: 'flex' }}>
-                                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={14} style={{ fill: '#F5B041', color: '#F5B041' }} />)}
-                            </div>
-                            <span>Trusted by <strong style={{ color: textPrimary }}>500+</strong> teachers across India</span>
-                        </div>
+                <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={stagger}
+                    style={{ position: 'relative', textAlign: 'center', maxWidth: '780px', margin: '0 auto' }}
+                >
+                    {/* Eyebrow */}
+                    <motion.div variants={fadeUp} style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.6875rem',
+                        fontWeight: '600',
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        color: 'var(--accent)',
+                        marginBottom: '2rem',
+                        padding: '6px 14px',
+                        background: 'var(--accent-muted)',
+                        borderRadius: '3px',
+                    }}>
+                        AI-Powered Assessment
                     </motion.div>
 
-                    {/* Right: Stats Cards */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                        style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}
-                    >
-                        {[
-                            { value: '10K+', label: 'Quizzes Created' },
-                            { value: '30s', label: 'Avg Generation Time' },
-                            { value: '50K+', label: 'Students Reached' },
-                            { value: '₹0', label: 'To Get Started' },
-                        ].map((stat, idx) => (
-                            <div
-                                key={idx}
-                                style={{
-                                    padding: '1.5rem',
-                                    background: bgCard,
-                                    borderRadius: '14px',
-                                    border: '1px solid #E8ECF0',
-                                    textAlign: 'center',
-                                }}
-                            >
-                                <div style={{ fontSize: '1.75rem', fontWeight: '700', color: textPrimary, fontFamily: 'var(--font-display)', marginBottom: '0.25rem' }}>
-                                    {stat.value}
-                                </div>
-                                <div style={{ fontSize: '0.6875rem', color: textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: '500' }}>
-                                    {stat.label}
-                                </div>
-                            </div>
-                        ))}
+                    {/* Headline */}
+                    <motion.h1 variants={fadeUp} style={{
+                        fontSize: 'clamp(3rem, 7vw, 5.5rem)',
+                        lineHeight: 1.05,
+                        fontFamily: 'var(--font-display)',
+                        fontWeight: '400',
+                        color: 'var(--text-primary)',
+                        marginBottom: '1.75rem',
+                        letterSpacing: '-0.02em',
+                    }}>
+                        Close the lecture<br />
+                        <span style={{ fontStyle: 'italic', color: 'var(--accent)' }}>with clarity.</span>
+                    </motion.h1>
+
+                    {/* Subtext */}
+                    <motion.p variants={fadeUp} style={{
+                        fontSize: '1.125rem',
+                        color: 'var(--text-muted)',
+                        lineHeight: 1.7,
+                        marginBottom: '3rem',
+                        fontWeight: '400',
+                        maxWidth: '480px',
+                        margin: '0 auto 3rem',
+                    }}>
+                        Upload. Generate. Share. Measure.
+                    </motion.p>
+
+                    {/* CTA */}
+                    <motion.div variants={fadeUp}>
+                        <Link
+                            to="/create"
+                            className="btn btn-primary"
+                            style={{
+                                padding: '1rem 2.5rem',
+                                fontSize: '0.9375rem',
+                                fontWeight: '600',
+                                letterSpacing: '0.01em',
+                            }}
+                        >
+                            Create a Quiz
+                            <ArrowRight size={18} />
+                        </Link>
                     </motion.div>
-                </div>
+                </motion.div>
             </section>
 
-            {/* How It Works - 3 Steps */}
-            <section style={{ padding: '4rem 2rem', background: accentLight }}>
-                <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+            {/* ── How It Works ── */}
+            <section className="landing-section" style={{
+                padding: '6rem 2rem',
+                borderTop: '1px solid var(--border-subtle)',
+            }}>
+                <div style={{ maxWidth: '960px', margin: '0 auto' }}>
                     <motion.div
                         initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        style={{ textAlign: 'center', marginBottom: '2.5rem' }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        className="landing-section-header"
+                        style={{ marginBottom: '4rem' }}
                     >
-                        <h2 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', fontFamily: 'var(--font-display)', fontWeight: '700', color: textPrimary, marginBottom: '0.5rem' }}>
-                            How It Works
+                        <p style={{
+                            fontSize: '0.6875rem',
+                            fontWeight: '600',
+                            letterSpacing: '0.14em',
+                            textTransform: 'uppercase',
+                            color: 'var(--text-dim)',
+                            marginBottom: '0.75rem',
+                        }}>
+                            Process
+                        </p>
+                        <h2 style={{
+                            fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
+                            fontFamily: 'var(--font-display)',
+                            fontWeight: '400',
+                            color: 'var(--text-primary)',
+                            letterSpacing: '-0.01em',
+                        }}>
+                            From upload to live quiz<br />
+                            <span style={{ color: 'var(--text-muted)' }}>in under a minute.</span>
                         </h2>
-                        <p style={{ fontSize: '1rem', color: textSecondary }}>From upload to live quiz in under a minute</p>
                     </motion.div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+                    <div className="landing-steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: 'var(--border-subtle)', borderRadius: '6px', overflow: 'hidden' }}>
                         {[
-                            { icon: Upload, step: '01', title: 'Upload Content', desc: 'Drop your PDF, PPT, notes, or paste any text.' },
-                            { icon: Sparkles, step: '02', title: 'AI Generates Quiz', desc: 'Get 10+ MCQs with explanations in seconds.' },
-                            { icon: Share2, step: '03', title: 'Share & Track', desc: 'Send link to students, watch live leaderboard.' },
-                        ].map((item, idx) => (
+                            { num: '01', title: 'Upload Content', desc: 'Drop your PDF, PPT, or notes. Paste any text.' },
+                            { num: '02', title: 'AI Generates', desc: 'Get MCQs with smart distractors in seconds.' },
+                            { num: '03', title: 'Share & Track', desc: 'One link to students. Watch the live leaderboard.' },
+                        ].map((step, idx) => (
                             <motion.div
                                 key={idx}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1 }}
+                                transition={{ delay: idx * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                                 style={{
-                                    padding: '1.75rem',
-                                    background: bgCard,
-                                    borderRadius: '16px',
-                                    border: '1px solid #E0E4E8',
-                                    position: 'relative',
+                                    padding: '2.5rem 2rem',
+                                    background: 'var(--bg-card)',
                                 }}
                             >
                                 <div style={{
-                                    position: 'absolute',
-                                    top: '-10px',
-                                    left: '1.5rem',
-                                    background: accentPrimary,
-                                    color: 'white',
-                                    fontSize: '0.625rem',
-                                    fontWeight: '700',
-                                    padding: '0.25rem 0.625rem',
-                                    borderRadius: '999px',
+                                    fontSize: '2.5rem',
+                                    fontFamily: 'var(--font-mono)',
+                                    fontWeight: '400',
+                                    color: 'var(--border-primary)',
+                                    marginBottom: '1.5rem',
+                                    lineHeight: 1,
                                 }}>
-                                    Step {item.step}
+                                    {step.num}
                                 </div>
-                                <item.icon size={32} strokeWidth={1.5} style={{ color: accentPrimary, marginBottom: '1rem', marginTop: '0.5rem' }} />
-                                <h3 style={{ fontSize: '1.0625rem', fontWeight: '600', color: textPrimary, marginBottom: '0.375rem' }}>{item.title}</h3>
-                                <p style={{ fontSize: '0.875rem', color: textSecondary, lineHeight: 1.5 }}>{item.desc}</p>
+                                <h3 style={{
+                                    fontSize: '1.0625rem',
+                                    fontWeight: '600',
+                                    fontFamily: 'var(--font-body)',
+                                    color: 'var(--text-primary)',
+                                    marginBottom: '0.5rem',
+                                }}>
+                                    {step.title}
+                                </h3>
+                                <p style={{
+                                    fontSize: '0.875rem',
+                                    color: 'var(--text-muted)',
+                                    lineHeight: 1.6,
+                                }}>
+                                    {step.desc}
+                                </p>
                             </motion.div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* Features Grid */}
-            <section style={{ padding: '5rem 2rem', background: bgPrimary }}>
-                <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+            {/* ── Features ── */}
+            <section className="landing-section" style={{
+                padding: '6rem 2rem',
+                borderTop: '1px solid var(--border-subtle)',
+            }}>
+                <div style={{ maxWidth: '960px', margin: '0 auto' }}>
                     <motion.div
                         initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        style={{ textAlign: 'center', marginBottom: '2.5rem' }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        className="landing-section-header"
+                        style={{ marginBottom: '4rem' }}
                     >
-                        <h2 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', fontFamily: 'var(--font-display)', fontWeight: '700', color: textPrimary, marginBottom: '0.5rem' }}>
-                            Everything You Need
+                        <p style={{
+                            fontSize: '0.6875rem',
+                            fontWeight: '600',
+                            letterSpacing: '0.14em',
+                            textTransform: 'uppercase',
+                            color: 'var(--text-dim)',
+                            marginBottom: '0.75rem',
+                        }}>
+                            Capabilities
+                        </p>
+                        <h2 style={{
+                            fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
+                            fontFamily: 'var(--font-display)',
+                            fontWeight: '400',
+                            color: 'var(--text-primary)',
+                            letterSpacing: '-0.01em',
+                        }}>
+                            Everything you need,<br />
+                            <span style={{ color: 'var(--text-muted)' }}>nothing you don't.</span>
                         </h2>
-                        <p style={{ fontSize: '1rem', color: textSecondary }}>Built for the modern Indian classroom</p>
                     </motion.div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                    <div className="landing-features-grid" style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                        gap: '1px',
+                        background: 'var(--border-subtle)',
+                        borderRadius: '6px',
+                        overflow: 'hidden',
+                    }}>
                         {features.map((feature, idx) => (
                             <motion.div
                                 key={idx}
                                 initial={{ opacity: 0, y: 16 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: idx * 0.05 }}
-                                whileHover={{ y: -3, boxShadow: '0 8px 30px rgba(0,0,0,0.06)' }}
+                                transition={{ delay: idx * 0.05, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                                 style={{
-                                    padding: '1.5rem',
-                                    background: bgCard,
-                                    border: '1px solid #E8ECF0',
-                                    borderRadius: '14px',
-                                    transition: 'all 0.2s ease',
+                                    padding: '2rem',
+                                    background: 'var(--bg-card)',
+                                    cursor: 'default',
+                                    transition: 'background 180ms cubic-bezier(0.16, 1, 0.3, 1)',
                                 }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-card-hover)'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-card)'}
                             >
-                                <div style={{
-                                    width: '44px',
-                                    height: '44px',
-                                    borderRadius: '12px',
-                                    background: accentLight,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginBottom: '1rem',
-                                    color: accentPrimary,
+                                <feature.icon
+                                    size={20}
+                                    strokeWidth={1.5}
+                                    style={{ color: 'var(--text-dim)', marginBottom: '1.25rem' }}
+                                />
+                                <h3 style={{
+                                    fontSize: '0.9375rem',
+                                    fontWeight: '600',
+                                    fontFamily: 'var(--font-body)',
+                                    color: 'var(--text-primary)',
+                                    marginBottom: '0.375rem',
                                 }}>
-                                    <feature.icon size={22} strokeWidth={1.5} />
-                                </div>
-                                <h3 style={{ fontSize: '1rem', fontWeight: '600', color: textPrimary, marginBottom: '0.375rem' }}>{feature.title}</h3>
-                                <p style={{ color: textSecondary, lineHeight: 1.55, fontSize: '0.875rem' }}>{feature.desc}</p>
+                                    {feature.title}
+                                </h3>
+                                <p style={{
+                                    color: 'var(--text-muted)',
+                                    lineHeight: 1.55,
+                                    fontSize: '0.8125rem',
+                                }}>
+                                    {feature.desc}
+                                </p>
                             </motion.div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* Testimonials */}
-            <section style={{ padding: '5rem 2rem', background: bgCard }}>
-                <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+            {/* ── Testimonials ── */}
+            <section className="landing-section" style={{
+                padding: '6rem 2rem',
+                borderTop: '1px solid var(--border-subtle)',
+            }}>
+                <div style={{ maxWidth: '960px', margin: '0 auto' }}>
                     <motion.div
                         initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        style={{ textAlign: 'center', marginBottom: '2.5rem' }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        className="landing-section-header"
+                        style={{ marginBottom: '4rem' }}
                     >
-                        <h2 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', fontFamily: 'var(--font-display)', fontWeight: '700', color: textPrimary, marginBottom: '0.5rem' }}>
-                            Loved by Teachers
+                        <p style={{
+                            fontSize: '0.6875rem',
+                            fontWeight: '600',
+                            letterSpacing: '0.14em',
+                            textTransform: 'uppercase',
+                            color: 'var(--text-dim)',
+                            marginBottom: '0.75rem',
+                        }}>
+                            Testimonials
+                        </p>
+                        <h2 style={{
+                            fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
+                            fontFamily: 'var(--font-display)',
+                            fontWeight: '400',
+                            color: 'var(--text-primary)',
+                            letterSpacing: '-0.01em',
+                        }}>
+                            Trusted by educators<br />
+                            <span style={{ color: 'var(--text-muted)' }}>across India.</span>
                         </h2>
-                        <p style={{ fontSize: '1rem', color: textSecondary }}>Join hundreds of educators transforming their classrooms</p>
                     </motion.div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                    <div className="landing-testimonials-grid" style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                        gap: '1px',
+                        background: 'var(--border-subtle)',
+                        borderRadius: '6px',
+                        overflow: 'hidden',
+                    }}>
                         {testimonials.map((t, idx) => (
                             <motion.div
                                 key={idx}
                                 initial={{ opacity: 0, y: 16 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1 }}
+                                transition={{ delay: idx * 0.1, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                                 style={{
-                                    background: bgPrimary,
-                                    borderRadius: '14px',
-                                    padding: '1.5rem',
-                                    border: '1px solid #E8ECF0',
+                                    padding: '2rem',
+                                    background: 'var(--bg-card)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
                                 }}
                             >
-                                <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '1rem' }}>
-                                    {[1, 2, 3, 4, 5].map(i => <Star key={i} size={14} style={{ fill: '#F5B041', color: '#F5B041' }} />)}
-                                </div>
-                                <p style={{ color: textPrimary, lineHeight: 1.6, marginBottom: '1.25rem', fontSize: '0.9375rem' }}>"{t.quote}"</p>
+                                <p style={{
+                                    color: 'var(--text-secondary)',
+                                    lineHeight: 1.65,
+                                    marginBottom: '1.75rem',
+                                    fontStyle: 'italic',
+                                    fontFamily: 'var(--font-display)',
+                                    fontSize: '1.0625rem',
+                                }}>
+                                    "{t.quote}"
+                                </p>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                     <div style={{
-                                        width: '40px',
-                                        height: '40px',
-                                        borderRadius: '50%',
-                                        background: accentPrimary,
-                                        color: 'white',
+                                        width: '32px',
+                                        height: '32px',
+                                        borderRadius: '4px',
+                                        background: 'var(--bg-elevated)',
+                                        border: '1px solid var(--border-primary)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         fontWeight: '600',
-                                        fontSize: '0.8125rem',
+                                        fontSize: '0.6875rem',
+                                        color: 'var(--text-muted)',
+                                        fontFamily: 'var(--font-mono)',
                                     }}>
                                         {t.avatar}
                                     </div>
                                     <div>
-                                        <div style={{ fontWeight: '600', fontSize: '0.9375rem', color: textPrimary }}>{t.name}</div>
-                                        <div style={{ fontSize: '0.75rem', color: textSecondary }}>{t.role}</div>
+                                        <div style={{ fontWeight: '600', fontSize: '0.8125rem', color: 'var(--text-primary)' }}>
+                                            {t.name}
+                                        </div>
+                                        <div style={{ fontSize: '0.6875rem', color: 'var(--text-dim)' }}>
+                                            {t.role}
+                                        </div>
                                     </div>
                                 </div>
                             </motion.div>
@@ -339,52 +400,75 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* Pricing */}
-            <section style={{ padding: '5rem 2rem', background: accentLight }}>
-                <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+            {/* ── Pricing ── */}
+            <section className="landing-section" style={{
+                padding: '6rem 2rem',
+                borderTop: '1px solid var(--border-subtle)',
+            }}>
+                <div style={{ maxWidth: '720px', margin: '0 auto' }}>
                     <motion.div
                         initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        style={{ textAlign: 'center', marginBottom: '2.5rem' }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        className="landing-section-header"
+                        style={{ marginBottom: '4rem' }}
                     >
-                        <h2 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.25rem)', fontFamily: 'var(--font-display)', fontWeight: '700', color: textPrimary, marginBottom: '0.5rem' }}>
-                            Simple, Honest Pricing
+                        <p style={{
+                            fontSize: '0.6875rem',
+                            fontWeight: '600',
+                            letterSpacing: '0.14em',
+                            textTransform: 'uppercase',
+                            color: 'var(--text-dim)',
+                            marginBottom: '0.75rem',
+                        }}>
+                            Pricing
+                        </p>
+                        <h2 style={{
+                            fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
+                            fontFamily: 'var(--font-display)',
+                            fontWeight: '400',
+                            color: 'var(--text-primary)',
+                            letterSpacing: '-0.01em',
+                        }}>
+                            Simple, honest pricing.
                         </h2>
-                        <p style={{ fontSize: '1rem', color: textSecondary }}>Start free and upgrade when you're ready</p>
                     </motion.div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                    <div className="landing-pricing-grid" style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                        gap: '1px',
+                        background: 'var(--border-subtle)',
+                        borderRadius: '6px',
+                        overflow: 'hidden',
+                    }}>
                         {/* Free */}
                         <motion.div
                             initial={{ opacity: 0, y: 16 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            style={{ padding: '2rem', borderRadius: '16px', border: '1px solid #D5DAE0', background: bgCard }}
+                            style={{ padding: '2.5rem 2rem', background: 'var(--bg-card)' }}
                         >
-                            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: textPrimary, marginBottom: '0.25rem' }}>Free</h3>
-                            <div style={{ fontSize: '2.5rem', fontWeight: '700', color: textPrimary, marginBottom: '1.5rem' }}>
-                                ₹0 <span style={{ fontSize: '0.875rem', fontWeight: '400', color: textSecondary }}>forever</span>
+                            <p style={{ fontSize: '0.8125rem', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Free</p>
+                            <div style={{ fontSize: '2.5rem', fontWeight: '300', fontFamily: 'var(--font-display)', color: 'var(--text-primary)', marginBottom: '2rem' }}>
+                                ₹0 <span style={{ fontSize: '0.875rem', color: 'var(--text-dim)', fontFamily: 'var(--font-body)', fontWeight: '400' }}>forever</span>
                             </div>
-                            <ul style={{ listStyle: 'none', padding: 0, marginBottom: '1.5rem' }}>
-                                {['5 quizzes per month', 'Up to 50 students/quiz', 'Basic analytics', 'PDF export'].map((f, i) => (
-                                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', color: textSecondary, marginBottom: '0.625rem', fontSize: '0.9375rem' }}>
-                                        <Check size={16} style={{ color: accentPrimary }} /> {f}
+                            <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem' }}>
+                                {['5 quizzes / month', 'Up to 50 students', 'Basic analytics', 'PDF export'].map((f, i) => (
+                                    <li key={i} style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.625rem',
+                                        color: 'var(--text-muted)',
+                                        marginBottom: '0.75rem',
+                                        fontSize: '0.8125rem',
+                                    }}>
+                                        <Check size={14} style={{ color: 'var(--text-dim)', flexShrink: 0 }} /> {f}
                                     </li>
                                 ))}
                             </ul>
-                            <Link to="/create" style={{
-                                display: 'block',
-                                textAlign: 'center',
-                                padding: '0.875rem',
-                                borderRadius: '10px',
-                                background: 'transparent',
-                                color: textPrimary,
-                                border: `1.5px solid #D5DAE0`,
-                                textDecoration: 'none',
-                                fontWeight: '600',
-                                fontSize: '0.9375rem',
-                            }}>
+                            <Link to="/create" className="btn btn-outline" style={{ width: '100%', padding: '0.875rem' }}>
                                 Get Started
                             </Link>
                         </motion.div>
@@ -395,46 +479,46 @@ const Landing = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.1 }}
-                            style={{ padding: '2rem', borderRadius: '16px', border: `2px solid ${accentPrimary}`, background: bgCard, position: 'relative' }}
+                            style={{
+                                padding: '2.5rem 2rem',
+                                background: 'var(--bg-card)',
+                                position: 'relative',
+                            }}
                         >
                             <div style={{
                                 position: 'absolute',
-                                top: 0,
-                                right: '1.5rem',
-                                transform: 'translateY(-50%)',
-                                background: accentPrimary,
-                                color: 'white',
-                                fontSize: '0.625rem',
+                                top: '2rem',
+                                right: '2rem',
+                                fontSize: '0.5625rem',
                                 fontWeight: '700',
-                                padding: '0.375rem 0.875rem',
-                                borderRadius: '999px',
+                                letterSpacing: '0.1em',
                                 textTransform: 'uppercase',
-                                letterSpacing: '0.04em',
+                                color: 'var(--accent)',
+                                background: 'var(--accent-muted)',
+                                padding: '4px 10px',
+                                borderRadius: '3px',
                             }}>
-                                Best Value
+                                Recommended
                             </div>
-                            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: textPrimary, marginBottom: '0.25rem' }}>Pro</h3>
-                            <div style={{ fontSize: '2.5rem', fontWeight: '700', color: textPrimary, marginBottom: '1.5rem' }}>
-                                ₹199 <span style={{ fontSize: '0.875rem', fontWeight: '400', color: textSecondary }}>/month</span>
+                            <p style={{ fontSize: '0.8125rem', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Pro</p>
+                            <div style={{ fontSize: '2.5rem', fontWeight: '300', fontFamily: 'var(--font-display)', color: 'var(--text-primary)', marginBottom: '2rem' }}>
+                                ₹199 <span style={{ fontSize: '0.875rem', color: 'var(--text-dim)', fontFamily: 'var(--font-body)', fontWeight: '400' }}>/month</span>
                             </div>
-                            <ul style={{ listStyle: 'none', padding: 0, marginBottom: '1.5rem' }}>
+                            <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem' }}>
                                 {['Unlimited quizzes', 'Unlimited students', 'Advanced analytics', 'All export formats', 'Priority support'].map((f, i) => (
-                                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', color: textSecondary, marginBottom: '0.625rem', fontSize: '0.9375rem' }}>
-                                        <Check size={16} style={{ color: accentPrimary }} /> {f}
+                                    <li key={i} style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.625rem',
+                                        color: 'var(--text-muted)',
+                                        marginBottom: '0.75rem',
+                                        fontSize: '0.8125rem',
+                                    }}>
+                                        <Check size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} /> {f}
                                     </li>
                                 ))}
                             </ul>
-                            <Link to="/create" style={{
-                                display: 'block',
-                                textAlign: 'center',
-                                padding: '0.875rem',
-                                borderRadius: '10px',
-                                background: accentPrimary,
-                                color: 'white',
-                                textDecoration: 'none',
-                                fontWeight: '600',
-                                fontSize: '0.9375rem',
-                            }}>
+                            <Link to="/create" className="btn btn-primary" style={{ width: '100%', padding: '0.875rem' }}>
                                 Upgrade to Pro
                             </Link>
                         </motion.div>
@@ -442,57 +526,115 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* Final CTA */}
-            <section style={{ padding: '5rem 2rem', background: accentPrimary }}>
-                <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
+            {/* ── Final CTA ── */}
+            <section className="landing-cta-section" style={{
+                padding: '6rem 2rem',
+                borderTop: '1px solid var(--border-subtle)',
+            }}>
+                <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.98 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                     >
-                        <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)', fontFamily: 'var(--font-display)', fontWeight: '700', color: 'white', marginBottom: '0.75rem' }}>
-                            Ready to Transform Your Classroom?
+                        <h2 style={{
+                            fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
+                            fontFamily: 'var(--font-display)',
+                            fontWeight: '400',
+                            color: 'var(--text-primary)',
+                            marginBottom: '1rem',
+                            letterSpacing: '-0.01em',
+                        }}>
+                            Ready to begin?
                         </h2>
-                        <p style={{ color: 'rgba(255,255,255,0.85)', marginBottom: '2rem', fontSize: '1.0625rem' }}>
-                            Join 500+ teachers saving hours on quiz preparation
+                        <p style={{
+                            color: 'var(--text-muted)',
+                            marginBottom: '2.5rem',
+                            fontSize: '1rem',
+                        }}>
+                            Join 500+ teachers transforming their classrooms.
                         </p>
                         <Link
                             to="/create"
+                            className="btn btn-primary"
                             style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                                background: 'white',
-                                color: accentPrimary,
-                                padding: '1rem 2.25rem',
-                                fontSize: '1rem',
-                                fontWeight: '600',
-                                borderRadius: '10px',
-                                textDecoration: 'none',
+                                padding: '1rem 2.5rem',
+                                fontSize: '0.9375rem',
                             }}
                         >
-                            Get Started for Free
+                            Create Your First Quiz
                             <ArrowRight size={18} />
                         </Link>
                     </motion.div>
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer style={{ padding: '2.5rem 2rem', borderTop: '1px solid #E8ECF0', background: bgCard }}>
-                <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <div style={{ width: '28px', height: '28px', background: accentPrimary, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                            <GraduationCap size={16} />
-                        </div>
-                        <span style={{ fontFamily: 'var(--font-display)', fontWeight: '600', fontSize: '1.0625rem', color: textPrimary }}>LectureClosure</span>
+            {/* ── Footer ── */}
+            <footer style={{
+                padding: '2.5rem 2rem',
+                borderTop: '1px solid var(--border-subtle)',
+            }}>
+                <div className="landing-footer-inner" style={{
+                    maxWidth: '960px',
+                    margin: '0 auto',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '1rem',
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0px' }}>
+                        <span style={{ fontWeight: '600', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Lecture</span>
+                        <span style={{ fontWeight: '400', fontSize: '0.875rem', color: 'var(--text-dim)' }}>Closure</span>
                     </div>
-                    <div style={{ display: 'flex', gap: '2rem', fontSize: '0.8125rem', color: textSecondary }}>
-                        <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</a>
-                        <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Terms</a>
-                        <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Contact</a>
+                    <div className="landing-footer-links" style={{ display: 'flex', gap: '2rem', fontSize: '0.75rem', alignItems: 'center' }}>
+                        <a href="#" style={{ color: 'var(--text-dim)' }}>Privacy</a>
+                        <a href="#" style={{ color: 'var(--text-dim)' }}>Terms</a>
+                        <a href="#" style={{ color: 'var(--text-dim)' }}>Contact</a>
+
+                        {/* Theme Toggle */}
+                        <button
+                            onClick={toggleTheme}
+                            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                            style={{
+                                position: 'relative',
+                                display: 'flex',
+                                alignItems: 'center',
+                                width: '56px',
+                                height: '28px',
+                                borderRadius: '14px',
+                                background: theme === 'dark' ? 'var(--bg-elevated)' : 'var(--border-primary)',
+                                border: '1px solid var(--border-primary)',
+                                cursor: 'pointer',
+                                padding: '3px',
+                                transition: 'all 0.3s ease',
+                                flexShrink: 0,
+                            }}
+                        >
+                            <motion.div
+                                layout
+                                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    borderRadius: '50%',
+                                    background: 'var(--accent)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginLeft: theme === 'dark' ? '0px' : 'auto',
+                                }}
+                            >
+                                {theme === 'dark' ? (
+                                    <Moon size={11} style={{ color: '#fff' }} />
+                                ) : (
+                                    <Sun size={11} style={{ color: '#fff' }} />
+                                )}
+                            </motion.div>
+                        </button>
                     </div>
-                    <p style={{ fontSize: '0.75rem', color: textSecondary }}>© 2026 LectureClosure. Made with ❤️ in India</p>
+                    <p style={{ fontSize: '0.6875rem', color: 'var(--text-dim)' }}>© 2026 LectureClosure</p>
                 </div>
             </footer>
         </div>

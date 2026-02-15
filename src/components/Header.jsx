@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { GraduationCap, Menu, X, LogOut, User } from 'lucide-react';
+import { Menu, X, LogOut, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
@@ -23,45 +23,50 @@ const Header = () => {
 
     return (
         <>
-            {/* Desktop Header - Clean, Static, macOS-inspired */}
+            {/* Desktop Header */}
             <header className="desktop-header" style={{
                 position: 'relative',
-                padding: '1.25rem 0',
+                padding: '0',
                 background: 'transparent',
             }}>
                 <div style={{
                     maxWidth: '1200px',
                     margin: '0 auto',
-                    padding: '0 2rem',
+                    padding: '1.25rem 2rem',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
+                    borderBottom: '1px solid var(--border-subtle)',
                 }}>
-                    {/* Logo */}
-                    <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-                        <div style={{
-                            width: '32px',
-                            height: '32px',
-                            background: '#2D8B75',
-                            borderRadius: '8px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}>
-                            <GraduationCap size={18} style={{ color: 'white' }} />
-                        </div>
+                    {/* Wordmark */}
+                    <Link to="/" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0px',
+                        textDecoration: 'none',
+                    }}>
                         <span style={{
-                            fontSize: '1.125rem',
+                            fontSize: '1.25rem',
                             fontWeight: '600',
-                            color: '#1A1A1A',
-                            letterSpacing: '-0.02em',
+                            color: 'var(--text-primary)',
+                            letterSpacing: '-0.03em',
+                            fontFamily: 'var(--font-body)',
                         }}>
-                            LectureClosure
+                            Lecture
+                        </span>
+                        <span style={{
+                            fontSize: '1.25rem',
+                            fontWeight: '400',
+                            color: 'var(--text-muted)',
+                            letterSpacing: '-0.03em',
+                            fontFamily: 'var(--font-body)',
+                        }}>
+                            Closure
                         </span>
                     </Link>
 
                     {/* Center Nav */}
-                    <nav style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                    <nav style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                         {navLinks.map((link) => {
                             const isActive = location.pathname === link.path;
                             return (
@@ -69,76 +74,71 @@ const Header = () => {
                                     key={link.path}
                                     to={link.path}
                                     style={{
-                                        fontSize: '0.9375rem',
+                                        fontSize: '0.8125rem',
                                         fontWeight: '500',
-                                        color: isActive ? '#1A1A1A' : '#7A7A7A',
+                                        color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
                                         textDecoration: 'none',
-                                        transition: 'color 0.2s',
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '4px',
+                                        background: isActive ? 'var(--bg-card)' : 'transparent',
+                                        transition: 'all 180ms cubic-bezier(0.16, 1, 0.3, 1)',
                                         position: 'relative',
+                                        letterSpacing: '0.01em',
                                     }}
                                 >
                                     {link.name}
-                                    {isActive && (
-                                        <motion.div
-                                            layoutId="activeNav"
-                                            style={{
-                                                position: 'absolute',
-                                                bottom: '-4px',
-                                                left: 0,
-                                                right: 0,
-                                                height: '2px',
-                                                background: '#1A1A1A',
-                                                borderRadius: '1px',
-                                            }}
-                                        />
-                                    )}
                                 </Link>
                             );
                         })}
                     </nav>
 
-                    {/* Right - Auth */}
+                    {/* Right — Auth */}
                     {!loading && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                             {isAuthenticated ? (
                                 <>
                                     <div style={{
                                         display: 'flex',
                                         alignItems: 'center',
                                         gap: '8px',
-                                        padding: '6px 12px 6px 8px',
-                                        background: '#F5F5F5',
-                                        borderRadius: '20px',
+                                        padding: '5px 12px 5px 6px',
+                                        background: 'var(--bg-card)',
+                                        borderRadius: '4px',
+                                        border: '1px solid var(--border-subtle)',
                                     }}>
                                         <div style={{
-                                            width: '24px',
-                                            height: '24px',
-                                            borderRadius: '50%',
-                                            background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+                                            width: '22px',
+                                            height: '22px',
+                                            borderRadius: '3px',
+                                            background: 'var(--accent)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                         }}>
-                                            <User size={12} style={{ color: 'white' }} />
+                                            <User size={11} style={{ color: 'white' }} />
                                         </div>
-                                        <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#1A1A1A' }}>
+                                        <span style={{
+                                            fontSize: '0.8125rem',
+                                            fontWeight: '500',
+                                            color: 'var(--text-secondary)',
+                                        }}>
                                             {profile?.full_name?.split(' ')[0] || 'Account'}
                                         </span>
                                     </div>
                                     <button
                                         onClick={handleSignOut}
                                         style={{
-                                            padding: '8px 16px',
-                                            fontSize: '0.875rem',
+                                            padding: '6px 12px',
+                                            fontSize: '0.8125rem',
                                             fontWeight: '500',
-                                            color: '#7A7A7A',
+                                            color: 'var(--text-dim)',
                                             background: 'transparent',
                                             border: 'none',
                                             cursor: 'pointer',
-                                            transition: 'color 0.2s',
+                                            letterSpacing: '0.01em',
                                         }}
                                     >
-                                        Logout
+                                        Log out
                                     </button>
                                 </>
                             ) : (
@@ -146,25 +146,21 @@ const Header = () => {
                                     <Link
                                         to="/login"
                                         style={{
-                                            padding: '8px 16px',
-                                            fontSize: '0.875rem',
+                                            padding: '6px 14px',
+                                            fontSize: '0.8125rem',
                                             fontWeight: '500',
-                                            color: '#7A7A7A',
+                                            color: 'var(--text-muted)',
                                             textDecoration: 'none',
                                         }}
                                     >
-                                        Login
+                                        Log in
                                     </Link>
                                     <Link
                                         to="/signup"
+                                        className="btn btn-primary"
                                         style={{
-                                            padding: '10px 20px',
-                                            fontSize: '0.875rem',
-                                            fontWeight: '600',
-                                            background: '#2D8B75',
-                                            color: 'white',
-                                            borderRadius: '8px',
-                                            textDecoration: 'none',
+                                            padding: '8px 18px',
+                                            fontSize: '0.8125rem',
                                         }}
                                     >
                                         Get Started
@@ -176,7 +172,7 @@ const Header = () => {
                 </div>
             </header>
 
-            {/* Mobile Header - Floating Island Style */}
+            {/* Mobile Header — Floating Dark Island */}
             <header className="mobile-header" style={{
                 display: 'none',
                 position: 'fixed',
@@ -191,30 +187,22 @@ const Header = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
                     style={{
-                        background: 'rgba(10, 10, 10, 0.9)',
+                        background: 'color-mix(in srgb, var(--bg-primary) 95%, transparent)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        borderRadius: '50px',
+                        borderRadius: '6px',
                         padding: '6px 6px 6px 16px',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15)',
+                        border: '1px solid var(--border-subtle)',
                     }}
                 >
-                    <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
-                        <div style={{
-                            width: '24px',
-                            height: '24px',
-                            background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-                            borderRadius: '6px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}>
-                            <GraduationCap size={14} style={{ color: 'white' }} />
-                        </div>
-                        <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'white' }}>
+                    <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0px', textDecoration: 'none' }}>
+                        <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-primary)' }}>
+                            Lecture
+                        </span>
+                        <span style={{ fontSize: '0.875rem', fontWeight: '400', color: 'var(--text-muted)' }}>
                             Closure
                         </span>
                     </Link>
@@ -224,14 +212,14 @@ const Header = () => {
                         style={{
                             width: '32px',
                             height: '32px',
-                            borderRadius: '50%',
-                            background: 'rgba(255, 255, 255, 0.1)',
+                            borderRadius: '4px',
+                            background: 'var(--bg-card)',
                             border: 'none',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: 'white',
+                            color: 'var(--text-secondary)',
                         }}
                     >
                         {isMenuOpen ? <X size={16} /> : <Menu size={16} />}
@@ -242,21 +230,20 @@ const Header = () => {
                 <AnimatePresence>
                     {isMenuOpen && (
                         <motion.div
-                            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                            initial={{ opacity: 0, y: 8, scale: 0.96 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                            transition={{ duration: 0.2 }}
+                            exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                            transition={{ duration: 0.18 }}
                             style={{
                                 position: 'absolute',
                                 top: 'calc(100% + 8px)',
                                 left: '50%',
                                 transform: 'translateX(-50%)',
-                                width: '240px',
-                                background: 'rgba(10, 10, 10, 0.95)',
-                                backdropFilter: 'blur(20px)',
-                                borderRadius: '20px',
-                                padding: '8px',
-                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+                                width: '220px',
+                                background: 'var(--bg-card)',
+                                border: '1px solid var(--border-primary)',
+                                borderRadius: '6px',
+                                padding: '6px',
                             }}
                         >
                             {navLinks.map((link) => (
@@ -266,53 +253,50 @@ const Header = () => {
                                     onClick={() => setIsMenuOpen(false)}
                                     style={{
                                         display: 'block',
-                                        padding: '12px 14px',
-                                        fontSize: '0.9375rem',
+                                        padding: '10px 12px',
+                                        fontSize: '0.875rem',
                                         fontWeight: '500',
-                                        color: location.pathname === link.path ? 'white' : 'rgba(255, 255, 255, 0.6)',
+                                        color: location.pathname === link.path ? 'var(--text-primary)' : 'var(--text-muted)',
                                         textDecoration: 'none',
-                                        borderRadius: '12px',
-                                        background: location.pathname === link.path ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                                        borderRadius: '4px',
+                                        background: location.pathname === link.path ? 'var(--bg-elevated)' : 'transparent',
                                     }}
                                 >
                                     {link.name}
                                 </Link>
                             ))}
 
-                            <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.1)', margin: '8px 12px' }} />
+                            <div style={{ height: '1px', background: 'var(--border-subtle)', margin: '6px 8px' }} />
 
                             {isAuthenticated ? (
                                 <button
                                     onClick={() => { handleSignOut(); setIsMenuOpen(false); }}
                                     style={{
                                         width: '100%',
-                                        padding: '12px 14px',
-                                        fontSize: '0.9375rem',
+                                        padding: '10px 12px',
+                                        fontSize: '0.875rem',
                                         fontWeight: '500',
-                                        color: 'rgba(255, 255, 255, 0.6)',
+                                        color: 'var(--text-muted)',
                                         background: 'transparent',
                                         border: 'none',
-                                        borderRadius: '12px',
+                                        borderRadius: '4px',
                                         textAlign: 'left',
                                         cursor: 'pointer',
                                     }}
                                 >
-                                    Logout
+                                    Log out
                                 </button>
                             ) : (
                                 <Link
                                     to="/signup"
                                     onClick={() => setIsMenuOpen(false)}
+                                    className="btn btn-primary"
                                     style={{
                                         display: 'block',
-                                        padding: '12px 14px',
-                                        fontSize: '0.9375rem',
-                                        fontWeight: '600',
-                                        color: '#0A0A0A',
-                                        background: 'white',
-                                        textDecoration: 'none',
-                                        borderRadius: '12px',
+                                        padding: '10px 12px',
+                                        fontSize: '0.875rem',
                                         textAlign: 'center',
+                                        margin: '4px',
                                     }}
                                 >
                                     Get Started
@@ -322,17 +306,6 @@ const Header = () => {
                     )}
                 </AnimatePresence>
             </header>
-
-            <style>{`
-                @media (max-width: 768px) {
-                    .desktop-header { display: none !important; }
-                    .mobile-header { display: block !important; }
-                }
-                @media (min-width: 769px) {
-                    .desktop-header { display: block !important; }
-                    .mobile-header { display: none !important; }
-                }
-            `}</style>
         </>
     );
 };

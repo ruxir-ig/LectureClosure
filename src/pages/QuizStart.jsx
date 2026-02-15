@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Play, Clock, HelpCircle, Loader2, AlertCircle, User } from 'lucide-react';
+import { ArrowRight, Clock, HelpCircle, Loader2, AlertCircle, User } from 'lucide-react';
 import { getQuiz } from '../services/quizService';
 
 const QuizStart = () => {
@@ -40,17 +40,12 @@ const QuizStart = () => {
         return (
             <div style={{
                 minHeight: '100vh',
-                background: 'linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 100%)',
+                background: 'var(--bg-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
             }}>
-                <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                >
-                    <Loader2 size={48} style={{ color: '#4361EE' }} />
-                </motion.div>
+                <Loader2 size={24} style={{ color: 'var(--accent)' }} className="animate-spin" />
             </div>
         );
     }
@@ -59,43 +54,31 @@ const QuizStart = () => {
         return (
             <div style={{
                 minHeight: '100vh',
-                background: 'linear-gradient(180deg, #FEF2F2 0%, #FFFFFF 100%)',
+                background: 'var(--bg-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '2rem',
             }}>
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
-                    style={{
-                        textAlign: 'center',
-                        maxWidth: '400px',
-                    }}
+                    style={{ textAlign: 'center', maxWidth: '380px' }}
                 >
-                    <div style={{
-                        width: '80px',
-                        height: '80px',
-                        background: '#FEE2E2',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 1.5rem',
+                    <AlertCircle size={24} style={{ color: 'var(--error)', marginBottom: '1rem' }} />
+                    <h1 style={{
+                        fontSize: '1.5rem',
+                        fontFamily: 'var(--font-display)',
+                        fontWeight: '400',
+                        color: 'var(--text-primary)',
+                        marginBottom: '0.5rem',
                     }}>
-                        <AlertCircle size={40} style={{ color: '#EF4444' }} />
-                    </div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem', color: '#1A1A2E' }}>
-                        Quiz Not Found
+                        Quiz not found
                     </h1>
-                    <p style={{ color: '#6B7280', marginBottom: '2rem' }}>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '0.8125rem', marginBottom: '2rem' }}>
                         {error}
                     </p>
-                    <button
-                        onClick={() => navigate('/')}
-                        className="btn btn-primary"
-                        style={{ padding: '1rem 2rem' }}
-                    >
+                    <button onClick={() => navigate('/')} className="btn btn-outline">
                         Go to Home
                     </button>
                 </motion.div>
@@ -105,175 +88,141 @@ const QuizStart = () => {
 
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
-        return `${mins} minute${mins !== 1 ? 's' : ''}`;
+        return `${mins} min`;
     };
 
     return (
         <div style={{
             minHeight: '100vh',
-            background: 'linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 100%)',
+            background: 'var(--bg-primary)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '2rem',
         }}>
             <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                style={{
-                    maxWidth: '480px',
-                    width: '100%',
-                }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                style={{ maxWidth: '420px', width: '100%' }}
             >
-                {/* Card */}
+                {/* Eyebrow */}
                 <div style={{
-                    background: 'white',
-                    borderRadius: '24px',
-                    padding: '2.5rem',
-                    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.08)',
-                    border: '1px solid #E5E7EB',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '0.6875rem',
+                    fontWeight: '600',
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: 'var(--accent)',
+                    marginBottom: '1.5rem',
+                    padding: '6px 14px',
+                    background: 'var(--accent-muted)',
+                    borderRadius: '3px',
                 }}>
-                    {/* Header Badge */}
-                    <div style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
-                        padding: '0.5rem 1rem',
-                        borderRadius: '999px',
-                        marginBottom: '1.5rem',
-                    }}>
-                        <HelpCircle size={16} style={{ color: '#4361EE' }} />
-                        <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#4361EE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            Quiz Challenge
-                        </span>
-                    </div>
-
-                    {/* Title */}
-                    <h1 style={{
-                        fontSize: 'clamp(1.75rem, 5vw, 2.25rem)',
-                        fontWeight: '800',
-                        marginBottom: '1rem',
-                        fontFamily: 'var(--font-display)',
-                        color: '#1A1A2E',
-                        lineHeight: 1.2,
-                    }}>
-                        {quiz.title}
-                    </h1>
-
-                    {/* Stats */}
-                    <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <div style={{
-                                width: '36px',
-                                height: '36px',
-                                borderRadius: '10px',
-                                background: '#F0FDF4',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                                <HelpCircle size={18} style={{ color: '#22C55E' }} />
-                            </div>
-                            <div>
-                                <div style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>Questions</div>
-                                <div style={{ fontWeight: '700', color: '#1A1A2E' }}>{quiz.questions?.length || 0}</div>
-                            </div>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <div style={{
-                                width: '36px',
-                                height: '36px',
-                                borderRadius: '10px',
-                                background: '#FFFBEB',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                                <Clock size={18} style={{ color: '#F59E0B' }} />
-                            </div>
-                            <div>
-                                <div style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>Time Limit</div>
-                                <div style={{ fontWeight: '700', color: '#1A1A2E' }}>{formatTime(quiz.time_limit)}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Name Input */}
-                    <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{
-                            display: 'block',
-                            fontSize: '0.875rem',
-                            fontWeight: '600',
-                            color: '#4B5563',
-                            marginBottom: '0.5rem',
-                        }}>
-                            Enter your name
-                        </label>
-                        <div style={{ position: 'relative' }}>
-                            <User size={18} style={{
-                                position: 'absolute',
-                                left: '1rem',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                color: '#9CA3AF',
-                            }} />
-                            <input
-                                type="text"
-                                value={studentName}
-                                onChange={(e) => setStudentName(e.target.value)}
-                                placeholder="Your name"
-                                onKeyDown={(e) => e.key === 'Enter' && handleStart()}
-                                style={{
-                                    width: '100%',
-                                    padding: '1rem 1rem 1rem 2.75rem',
-                                    borderRadius: '14px',
-                                    border: '2px solid #E5E7EB',
-                                    fontSize: '1rem',
-                                    outline: 'none',
-                                    transition: 'border-color 0.2s ease',
-                                }}
-                                onFocus={(e) => e.target.style.borderColor = '#4361EE'}
-                                onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Start Button */}
-                    <motion.button
-                        onClick={handleStart}
-                        disabled={!studentName.trim()}
-                        whileHover={studentName.trim() ? { scale: 1.02 } : {}}
-                        whileTap={studentName.trim() ? { scale: 0.98 } : {}}
-                        className="btn btn-primary"
-                        style={{
-                            width: '100%',
-                            padding: '1.25rem',
-                            fontSize: '1.125rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '0.75rem',
-                            opacity: studentName.trim() ? 1 : 0.5,
-                            cursor: studentName.trim() ? 'pointer' : 'not-allowed',
-                            boxShadow: studentName.trim() ? '0 8px 24px rgba(67, 97, 238, 0.3)' : 'none',
-                        }}
-                    >
-                        <Play size={22} />
-                        Start Quiz
-                    </motion.button>
-
-                    {/* Footer note */}
-                    <p style={{
-                        textAlign: 'center',
-                        fontSize: '0.75rem',
-                        color: '#9CA3AF',
-                        marginTop: '1.5rem',
-                    }}>
-                        Your score will appear on the leaderboard
-                    </p>
+                    Quiz
                 </div>
+
+                {/* Title */}
+                <h1 style={{
+                    fontSize: 'clamp(1.5rem, 4vw, 2.25rem)',
+                    fontFamily: 'var(--font-display)',
+                    fontWeight: '400',
+                    color: 'var(--text-primary)',
+                    lineHeight: 1.2,
+                    marginBottom: '1rem',
+                    letterSpacing: '-0.01em',
+                }}>
+                    {quiz.title}
+                </h1>
+
+                {/* Stats */}
+                <div style={{
+                    display: 'flex',
+                    gap: '1.5rem',
+                    marginBottom: '2rem',
+                    padding: '1rem 0',
+                    borderTop: '1px solid var(--border-subtle)',
+                    borderBottom: '1px solid var(--border-subtle)',
+                }}>
+                    <div>
+                        <div style={{
+                            fontSize: '1.25rem',
+                            fontWeight: '600',
+                            fontFamily: 'var(--font-mono)',
+                            color: 'var(--text-primary)',
+                            fontVariantNumeric: 'tabular-nums',
+                        }}>
+                            {quiz.questions?.length || 0}
+                        </div>
+                        <div style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', fontWeight: '500' }}>
+                            Questions
+                        </div>
+                    </div>
+                    <div>
+                        <div style={{
+                            fontSize: '1.25rem',
+                            fontWeight: '600',
+                            fontFamily: 'var(--font-mono)',
+                            color: 'var(--text-primary)',
+                            fontVariantNumeric: 'tabular-nums',
+                        }}>
+                            {formatTime(quiz.time_limit)}
+                        </div>
+                        <div style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', fontWeight: '500' }}>
+                            Time Limit
+                        </div>
+                    </div>
+                </div>
+
+                {/* Name Input */}
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{
+                        display: 'block',
+                        fontSize: '0.75rem',
+                        fontWeight: '600',
+                        color: 'var(--text-muted)',
+                        marginBottom: '0.375rem',
+                    }}>
+                        Your Name
+                    </label>
+                    <input
+                        type="text"
+                        value={studentName}
+                        onChange={(e) => setStudentName(e.target.value)}
+                        placeholder="Enter your name"
+                        onKeyDown={(e) => e.key === 'Enter' && handleStart()}
+                        style={{ width: '100%', fontSize: '0.875rem' }}
+                    />
+                </div>
+
+                {/* Start Button */}
+                <button
+                    onClick={handleStart}
+                    disabled={!studentName.trim()}
+                    className="btn btn-primary"
+                    style={{
+                        width: '100%',
+                        padding: '1rem',
+                        fontSize: '0.9375rem',
+                        gap: '0.75rem',
+                        opacity: studentName.trim() ? 1 : 0.35,
+                        cursor: studentName.trim() ? 'pointer' : 'not-allowed',
+                    }}
+                >
+                    Begin
+                    <ArrowRight size={18} />
+                </button>
+
+                <p style={{
+                    textAlign: 'center',
+                    fontSize: '0.6875rem',
+                    color: 'var(--text-dim)',
+                    marginTop: '1.25rem',
+                }}>
+                    Your score will appear on the leaderboard.
+                </p>
             </motion.div>
         </div>
     );

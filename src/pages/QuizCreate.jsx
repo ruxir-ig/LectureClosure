@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileUp, Settings, CheckCircle2, Loader2, Sparkles, X, AlertCircle, Brain, Zap, FileText, Share2, GripVertical, Plus, Trash2 } from 'lucide-react';
+import { Upload, FileUp, Settings, CheckCircle2, Loader2, Sparkles, X, Brain, Zap, Share2, GripVertical, Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import ShareModal from '../components/ShareModal';
 import { createQuiz, getQuizShareUrl } from '../services/quizService';
 import { useAuth } from '../context/AuthContext';
@@ -17,8 +17,8 @@ const QuizCreate = () => {
         { text: 'Generating questions...', done: false },
         { text: 'Creating smart distractors...', done: false },
     ]);
+    const [expandedQuestion, setExpandedQuestion] = useState(0);
 
-    // Share modal state
     const [showShareModal, setShowShareModal] = useState(false);
     const [shareUrl, setShareUrl] = useState('');
     const [quizTitle, setQuizTitle] = useState('');
@@ -54,9 +54,7 @@ const QuizCreate = () => {
         e.preventDefault();
         setIsDragging(true);
     };
-
     const onDragLeave = () => setIsDragging(false);
-
     const onDrop = (e) => {
         e.preventDefault();
         setIsDragging(false);
@@ -68,76 +66,106 @@ const QuizCreate = () => {
         }
     };
 
-    const stepLabels = ['Upload', 'AI Magic', 'Review'];
-    const stepIcons = [FileUp, Brain, CheckCircle2];
+    const demoQuestions = [
+        { q: "What is the primary role of mitochondria in a cell?", type: 'MCQ', difficulty: 'Easy', options: ['Energy production (ATP)', 'Protein synthesis', 'Cell division', 'DNA replication'] },
+        { q: "Which of the following describes anaerobic respiration best?", type: 'MCQ', difficulty: 'Medium', options: ['Requires oxygen', 'Occurs without oxygen', 'Produces more ATP than aerobic', 'Only happens in plants'] },
+        { q: "How many ATP molecules are produced in glycolysis?", type: 'MCQ', difficulty: 'Hard', options: ['2 ATP', '4 ATP', '36 ATP', '38 ATP'] },
+    ];
+
+    // Subtle AI sparkle SVG
+    const AiSparkle = () => (
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ opacity: 0.5 }}>
+            <path d="M8 0L9.5 5.5L16 8L9.5 10.5L8 16L6.5 10.5L0 8L6.5 5.5L8 0Z" fill="var(--accent)" />
+        </svg>
+    );
 
     return (
-        <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #FAFBFC 0%, #FFFFFF 100%)', padding: '3rem 0' }}>
-            <div className="container" style={{ maxWidth: '800px' }}>
+        <div style={{
+            minHeight: '100vh',
+            background: 'var(--bg-primary)',
+            padding: '2rem 0 4rem',
+        }}>
+            <div className="container" style={{ maxWidth: '900px' }}>
 
                 {/* Header */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
-                    style={{ textAlign: 'center', marginBottom: '3rem' }}
+                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ marginBottom: '2rem' }}
                 >
-                    <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.75rem)', fontWeight: '800', marginBottom: '0.75rem', fontFamily: 'var(--font-display)' }}>
-                        Create your Quiz
-                    </h1>
-                    <p style={{ color: '#6B7280', fontSize: '1.125rem' }}>
-                        Upload your lecture notes and let AI do the heavy lifting.
+                    <p style={{
+                        fontSize: '0.6875rem',
+                        fontWeight: '600',
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        color: 'var(--text-dim)',
+                        marginBottom: '0.5rem',
+                    }}>
+                        Create
                     </p>
+                    <h1 style={{
+                        fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+                        fontFamily: 'var(--font-display)',
+                        fontWeight: '400',
+                        color: 'var(--text-primary)',
+                        letterSpacing: '-0.01em',
+                    }}>
+                        Generate your quiz
+                    </h1>
                 </motion.div>
 
-                {/* Visual Stepper */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '3rem' }}>
-                    {stepLabels.map((label, idx) => {
-                        const Icon = stepIcons[idx];
+                {/* Step Indicator */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0',
+                    marginBottom: '2.5rem',
+                    borderBottom: '1px solid var(--border-subtle)',
+                    paddingBottom: '1.5rem',
+                }}>
+                    {['Upload', 'Processing', 'Review'].map((label, idx) => {
                         const isActive = step === idx + 1;
                         const isComplete = step > idx + 1;
-
                         return (
                             <React.Fragment key={idx}>
-                                <motion.div
-                                    initial={{ scale: 0.9 }}
-                                    animate={{ scale: isActive ? 1.05 : 1 }}
-                                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}
-                                >
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem',
+                                }}>
                                     <div style={{
-                                        width: '48px',
-                                        height: '48px',
-                                        borderRadius: '14px',
+                                        width: '24px',
+                                        height: '24px',
+                                        borderRadius: '4px',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        background: isComplete ? 'linear-gradient(135deg, #22C55E, #16A34A)' :
-                                            isActive ? 'linear-gradient(135deg, #4361EE, #7C3AED)' : '#F3F4F6',
-                                        color: isComplete || isActive ? 'white' : '#9CA3AF',
-                                        transition: 'all 0.3s ease',
-                                        boxShadow: isActive ? '0 8px 24px rgba(67, 97, 238, 0.3)' : 'none',
+                                        fontSize: '0.6875rem',
+                                        fontWeight: '700',
+                                        fontFamily: 'var(--font-mono)',
+                                        background: isComplete ? 'var(--success)' : isActive ? 'var(--accent)' : 'var(--bg-card)',
+                                        color: isComplete || isActive ? '#fff' : 'var(--text-dim)',
+                                        border: !isComplete && !isActive ? '1px solid var(--border-primary)' : 'none',
+                                        transition: 'all 180ms cubic-bezier(0.16, 1, 0.3, 1)',
                                     }}>
-                                        {isComplete ? <CheckCircle2 size={22} /> : <Icon size={22} />}
+                                        {isComplete ? <CheckCircle2 size={13} /> : idx + 1}
                                     </div>
                                     <span style={{
                                         fontSize: '0.75rem',
-                                        fontWeight: '600',
-                                        color: isActive ? '#4361EE' : isComplete ? '#22C55E' : '#9CA3AF',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.05em',
+                                        fontWeight: '500',
+                                        color: isActive ? 'var(--text-primary)' : isComplete ? 'var(--success)' : 'var(--text-dim)',
                                     }}>
                                         {label}
                                     </span>
-                                </motion.div>
-
-                                {idx < stepLabels.length - 1 && (
+                                </div>
+                                {idx < 2 && (
                                     <div style={{
-                                        width: '80px',
-                                        height: '3px',
-                                        margin: '0 0.75rem',
-                                        marginBottom: '1.5rem',
-                                        borderRadius: '2px',
-                                        background: step > idx + 1 ? 'linear-gradient(90deg, #22C55E, #16A34A)' : '#E5E7EB',
-                                        transition: 'all 0.3s ease',
+                                        flex: 1,
+                                        height: '1px',
+                                        background: isComplete ? 'var(--success)' : 'var(--border-primary)',
+                                        margin: '0 1rem',
+                                        transition: 'background 300ms ease',
                                     }} />
                                 )}
                             </React.Fragment>
@@ -152,45 +180,58 @@ const QuizCreate = () => {
                     {step === 1 && (
                         <motion.div
                             key="upload"
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
+                            exit={{ opacity: 0, y: -12 }}
+                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                         >
                             <div
                                 onDragOver={onDragOver}
                                 onDragLeave={onDragLeave}
                                 onDrop={onDrop}
                                 style={{
-                                    border: isDragging ? '2px solid #4361EE' : '2px dashed #D1D5DB',
-                                    borderRadius: '24px',
+                                    border: `1px ${isDragging ? 'solid' : 'dashed'} ${isDragging ? 'var(--accent)' : 'var(--border-primary)'}`,
+                                    borderRadius: '6px',
                                     padding: '4rem 2rem',
                                     textAlign: 'center',
-                                    background: isDragging ? 'rgba(67, 97, 238, 0.03)' : 'white',
-                                    transition: 'all 0.2s ease',
+                                    background: isDragging ? 'var(--accent-muted)' : 'var(--bg-card)',
+                                    transition: 'all 180ms cubic-bezier(0.16, 1, 0.3, 1)',
                                     cursor: 'pointer',
                                 }}
                             >
                                 <motion.div
-                                    animate={isDragging ? { scale: 1.1, rotate: 5 } : { scale: 1, rotate: 0 }}
+                                    animate={isDragging ? { y: -4 } : { y: 0 }}
+                                    transition={{ duration: 0.18 }}
                                     style={{
-                                        width: '80px',
-                                        height: '80px',
-                                        background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
-                                        borderRadius: '20px',
+                                        width: '48px',
+                                        height: '48px',
+                                        background: 'var(--bg-elevated)',
+                                        border: '1px solid var(--border-primary)',
+                                        borderRadius: '6px',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        margin: '0 auto 1.5rem',
+                                        margin: '0 auto 1.25rem',
                                     }}
                                 >
-                                    <FileUp size={36} style={{ color: '#4361EE' }} />
+                                    <FileUp size={22} style={{ color: 'var(--text-dim)' }} />
                                 </motion.div>
 
-                                <h2 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '0.5rem' }}>
+                                <h2 style={{
+                                    fontSize: '1.125rem',
+                                    fontWeight: '600',
+                                    fontFamily: 'var(--font-body)',
+                                    color: 'var(--text-primary)',
+                                    marginBottom: '0.5rem',
+                                }}>
                                     Drop your files here
                                 </h2>
-                                <p style={{ color: '#6B7280', marginBottom: '1.5rem' }}>
-                                    Support for PDF, PPT, and DOCX files up to 20MB
+                                <p style={{
+                                    color: 'var(--text-dim)',
+                                    marginBottom: '1.5rem',
+                                    fontSize: '0.8125rem',
+                                }}>
+                                    PDF, PPT, DOCX — up to 20MB
                                 </p>
 
                                 <input
@@ -203,51 +244,11 @@ const QuizCreate = () => {
                                 <label
                                     htmlFor="file-upload"
                                     className="btn btn-primary"
-                                    style={{ padding: '0.875rem 2rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+                                    style={{ padding: '0.75rem 1.75rem', cursor: 'pointer' }}
                                 >
-                                    <Upload size={18} />
+                                    <Upload size={16} />
                                     Browse Files
                                 </label>
-                            </div>
-
-                            {/* Feature Cards */}
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginTop: '2rem' }}>
-                                {[
-                                    { icon: Sparkles, title: 'AI Context Mapping', desc: 'Maps complex concepts to specific question types', color: '#4361EE', bg: '#EEF2FF' },
-                                    { icon: Zap, title: 'Adaptive Distractors', desc: 'LLM-powered distractors targeting misconceptions', color: '#F59E0B', bg: '#FFFBEB' },
-                                ].map((feature, idx) => (
-                                    <motion.div
-                                        key={idx}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.2 + idx * 0.1 }}
-                                        style={{
-                                            background: 'white',
-                                            border: '1px solid #F3F4F6',
-                                            borderRadius: '16px',
-                                            padding: '1.25rem',
-                                            display: 'flex',
-                                            gap: '1rem',
-                                        }}
-                                    >
-                                        <div style={{
-                                            width: '44px',
-                                            height: '44px',
-                                            borderRadius: '12px',
-                                            background: feature.bg,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            flexShrink: 0,
-                                        }}>
-                                            <feature.icon size={20} style={{ color: feature.color }} />
-                                        </div>
-                                        <div>
-                                            <h4 style={{ fontWeight: '700', marginBottom: '0.25rem' }}>{feature.title}</h4>
-                                            <p style={{ fontSize: '0.875rem', color: '#6B7280', lineHeight: 1.5 }}>{feature.desc}</p>
-                                        </div>
-                                    </motion.div>
-                                ))}
                             </div>
                         </motion.div>
                     )}
@@ -259,102 +260,90 @@ const QuizCreate = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            style={{ textAlign: 'center', padding: '3rem 0' }}
+                            style={{ padding: '2rem 0' }}
                         >
-                            {/* AI Brain Animation */}
-                            <div style={{ position: 'relative', width: '140px', height: '140px', margin: '0 auto 2rem' }}>
-                                {/* Outer ring */}
-                                <svg width="140" height="140" style={{ position: 'absolute', top: 0, left: 0 }}>
-                                    <circle
-                                        cx="70"
-                                        cy="70"
-                                        r="65"
-                                        fill="none"
-                                        stroke="#F3F4F6"
-                                        strokeWidth="6"
-                                    />
-                                    <motion.circle
-                                        cx="70"
-                                        cy="70"
-                                        r="65"
-                                        fill="none"
-                                        stroke="url(#gradient)"
-                                        strokeWidth="6"
-                                        strokeLinecap="round"
-                                        strokeDasharray={408}
-                                        strokeDashoffset={408 - (408 * processingProgress / 100)}
-                                        style={{ transformOrigin: 'center', transform: 'rotate(-90deg)' }}
-                                    />
-                                    <defs>
-                                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stopColor="#4361EE" />
-                                            <stop offset="100%" stopColor="#7C3AED" />
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-
-                                {/* Brain icon */}
-                                <motion.div
-                                    animate={{ rotate: 360 }}
-                                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                                    style={{
-                                        position: 'absolute',
-                                        top: '50%',
-                                        left: '50%',
-                                        transform: 'translate(-50%, -50%)',
-                                        width: '80px',
-                                        height: '80px',
-                                        background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
-                                        borderRadius: '50%',
+                            <div style={{
+                                background: 'var(--bg-card)',
+                                border: '1px solid var(--border-primary)',
+                                borderRadius: '6px',
+                                padding: '3rem 2rem',
+                                textAlign: 'center',
+                            }}>
+                                {/* Progress bar */}
+                                <div style={{
+                                    maxWidth: '400px',
+                                    margin: '0 auto 2rem',
+                                }}>
+                                    <div style={{
                                         display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                    }}
-                                >
-                                    <Brain size={36} style={{ color: '#4361EE' }} />
-                                </motion.div>
-                            </div>
-
-                            <div style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '0.5rem' }}>
-                                {processingProgress}%
-                            </div>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>
-                                AI is cooking your quiz...
-                            </h2>
-                            <p style={{ color: '#6B7280', marginBottom: '2rem' }}>
-                                Analyzing <strong>"{file?.name}"</strong>
-                            </p>
-
-                            {/* Processing Steps */}
-                            <div style={{ maxWidth: '400px', margin: '0 auto', textAlign: 'left' }}>
-                                {processingSteps.map((pStep, idx) => (
-                                    <motion.div
-                                        key={idx}
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: idx * 0.1 }}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.75rem',
-                                            padding: '0.875rem 1rem',
-                                            background: pStep.done ? '#F0FDF4' : '#FAFBFC',
-                                            border: '1px solid',
-                                            borderColor: pStep.done ? '#BBF7D0' : '#E5E7EB',
-                                            borderRadius: '12px',
-                                            marginBottom: '0.5rem',
-                                        }}
-                                    >
-                                        {pStep.done ? (
-                                            <CheckCircle2 size={18} style={{ color: '#22C55E' }} />
-                                        ) : (
-                                            <Loader2 size={18} style={{ color: '#4361EE' }} className="animate-spin" />
-                                        )}
-                                        <span style={{ color: pStep.done ? '#166534' : '#4B5563', fontSize: '0.875rem' }}>
-                                            {pStep.text}
+                                        justifyContent: 'space-between',
+                                        marginBottom: '0.5rem',
+                                    }}>
+                                        <span style={{
+                                            fontSize: '0.75rem',
+                                            fontWeight: '600',
+                                            color: 'var(--text-muted)',
+                                        }}>
+                                            Analyzing "{file?.name}"
                                         </span>
-                                    </motion.div>
-                                ))}
+                                        <span style={{
+                                            fontSize: '0.75rem',
+                                            fontWeight: '700',
+                                            fontFamily: 'var(--font-mono)',
+                                            color: 'var(--accent)',
+                                        }}>
+                                            {processingProgress}%
+                                        </span>
+                                    </div>
+                                    <div style={{
+                                        height: '3px',
+                                        background: 'var(--bg-elevated)',
+                                        borderRadius: '2px',
+                                        overflow: 'hidden',
+                                    }}>
+                                        <motion.div
+                                            animate={{ width: `${processingProgress}%` }}
+                                            transition={{ duration: 0.15 }}
+                                            style={{
+                                                height: '100%',
+                                                background: 'var(--accent)',
+                                                borderRadius: '2px',
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Processing Steps */}
+                                <div style={{ maxWidth: '360px', margin: '0 auto', textAlign: 'left' }}>
+                                    {processingSteps.map((pStep, idx) => (
+                                        <motion.div
+                                            key={idx}
+                                            initial={{ opacity: 0, x: -12 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: idx * 0.08 }}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.75rem',
+                                                padding: '0.625rem 0',
+                                                borderBottom: idx < processingSteps.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                                            }}
+                                        >
+                                            {pStep.done ? (
+                                                <CheckCircle2 size={15} style={{ color: 'var(--success)', flexShrink: 0 }} />
+                                            ) : (
+                                                <Loader2 size={15} style={{ color: 'var(--accent)', flexShrink: 0 }} className="animate-spin" />
+                                            )}
+                                            <span style={{
+                                                color: pStep.done ? 'var(--text-secondary)' : 'var(--text-muted)',
+                                                fontSize: '0.8125rem',
+                                                fontWeight: '500',
+                                            }}>
+                                                {pStep.text}
+                                            </span>
+                                        </motion.div>
+                                    ))}
+                                </div>
                             </div>
                         </motion.div>
                     )}
@@ -363,164 +352,194 @@ const QuizCreate = () => {
                     {step === 3 && (
                         <motion.div
                             key="review"
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                         >
                             <div style={{
-                                background: 'white',
-                                border: '1px solid #E5E7EB',
-                                borderRadius: '20px',
+                                background: 'var(--bg-card)',
+                                border: '1px solid var(--border-primary)',
+                                borderRadius: '6px',
                                 overflow: 'hidden',
                                 marginBottom: '1.5rem',
                             }}>
                                 {/* Review Header */}
                                 <div style={{
-                                    padding: '1.25rem 1.5rem',
-                                    borderBottom: '1px solid #F3F4F6',
+                                    padding: '1rem 1.5rem',
+                                    borderBottom: '1px solid var(--border-subtle)',
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
                                 }}>
-                                    <div>
-                                        <h2 style={{ fontSize: '1.25rem', fontWeight: '700' }}>Quiz Preview</h2>
-                                        <p style={{ fontSize: '0.875rem', color: '#6B7280' }}>3 questions generated</p>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                        <AiSparkle />
+                                        <div>
+                                            <h2 style={{ fontSize: '0.9375rem', fontWeight: '600', fontFamily: 'var(--font-body)', color: 'var(--text-primary)' }}>
+                                                Generated Questions
+                                            </h2>
+                                            <p style={{ fontSize: '0.6875rem', color: 'var(--text-dim)' }}>
+                                                {demoQuestions.length} questions from your content
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <button style={{ padding: '0.5rem', borderRadius: '8px', border: '1px solid #E5E7EB', background: 'white', cursor: 'pointer' }}>
-                                            <Settings size={18} style={{ color: '#6B7280' }} />
-                                        </button>
-                                        <button onClick={() => { setStep(1); setFile(null); setProcessingProgress(0); }} style={{ padding: '0.5rem', borderRadius: '8px', border: '1px solid #E5E7EB', background: 'white', cursor: 'pointer' }}>
-                                            <X size={18} style={{ color: '#6B7280' }} />
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={() => { setStep(1); setFile(null); setProcessingProgress(0); }}
+                                        style={{
+                                            padding: '6px',
+                                            borderRadius: '4px',
+                                            border: '1px solid var(--border-primary)',
+                                            background: 'transparent',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: 'var(--text-dim)',
+                                        }}
+                                    >
+                                        <X size={14} />
+                                    </button>
                                 </div>
 
-                                {/* Questions */}
-                                <div style={{ padding: '1rem' }}>
-                                    {[
-                                        { q: "What is the primary role of mitochondria in a cell?", type: 'MCQ', difficulty: 'Easy' },
-                                        { q: "Which of the following describes anaerobic respiration best?", type: 'MCQ', difficulty: 'Medium' },
-                                        { q: "How many ATP molecules are produced in glycolysis?", type: 'MCQ', difficulty: 'Hard' },
-                                    ].map((question, idx) => (
+                                {/* Questions List */}
+                                <div>
+                                    {demoQuestions.map((question, idx) => (
                                         <motion.div
                                             key={idx}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: idx * 0.1 }}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: idx * 0.08 }}
                                             style={{
-                                                padding: '1.25rem',
-                                                background: '#FAFBFC',
-                                                borderRadius: '14px',
-                                                marginBottom: '0.75rem',
-                                                border: '1px solid transparent',
-                                                cursor: 'grab',
+                                                borderBottom: idx < demoQuestions.length - 1 ? '1px solid var(--border-subtle)' : 'none',
                                             }}
                                         >
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                    <GripVertical size={16} style={{ color: '#D1D5DB' }} />
+                                            {/* Question Header (clickable) */}
+                                            <div
+                                                onClick={() => setExpandedQuestion(expandedQuestion === idx ? -1 : idx)}
+                                                style={{
+                                                    padding: '1rem 1.5rem',
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                    cursor: 'pointer',
+                                                    transition: 'background 150ms ease',
+                                                }}
+                                                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-card-hover)'}
+                                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                            >
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
                                                     <span style={{
                                                         fontSize: '0.625rem',
                                                         fontWeight: '700',
-                                                        color: '#4361EE',
-                                                        textTransform: 'uppercase',
-                                                        letterSpacing: '0.1em',
-                                                        background: '#EEF2FF',
-                                                        padding: '0.25rem 0.5rem',
-                                                        borderRadius: '4px',
+                                                        fontFamily: 'var(--font-mono)',
+                                                        color: 'var(--accent)',
+                                                        background: 'var(--accent-muted)',
+                                                        padding: '3px 8px',
+                                                        borderRadius: '3px',
+                                                        letterSpacing: '0.05em',
                                                     }}>
                                                         Q{idx + 1}
                                                     </span>
                                                     <span style={{
-                                                        fontSize: '0.625rem',
+                                                        fontSize: '0.875rem',
+                                                        fontWeight: '500',
+                                                        color: 'var(--text-primary)',
+                                                        flex: 1,
+                                                    }}>
+                                                        {question.q}
+                                                    </span>
+                                                    <span style={{
+                                                        fontSize: '0.5625rem',
                                                         fontWeight: '600',
-                                                        color: question.difficulty === 'Easy' ? '#22C55E' : question.difficulty === 'Medium' ? '#F59E0B' : '#EF4444',
-                                                        background: question.difficulty === 'Easy' ? '#F0FDF4' : question.difficulty === 'Medium' ? '#FFFBEB' : '#FEF2F2',
-                                                        padding: '0.25rem 0.5rem',
-                                                        borderRadius: '4px',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.08em',
+                                                        color: question.difficulty === 'Easy' ? 'var(--success)' : question.difficulty === 'Medium' ? 'var(--warning)' : 'var(--error)',
+                                                        background: question.difficulty === 'Easy' ? 'var(--success-muted)' : question.difficulty === 'Medium' ? 'var(--warning-muted)' : 'var(--error-muted)',
+                                                        padding: '3px 8px',
+                                                        borderRadius: '3px',
+                                                        flexShrink: 0,
                                                     }}>
                                                         {question.difficulty}
                                                     </span>
                                                 </div>
-                                                <button style={{ padding: '0.375rem', borderRadius: '6px', border: 'none', background: 'transparent', cursor: 'pointer' }}>
-                                                    <Trash2 size={14} style={{ color: '#9CA3AF' }} />
-                                                </button>
+                                                <div style={{ marginLeft: '0.75rem', color: 'var(--text-dim)' }}>
+                                                    {expandedQuestion === idx ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                                                </div>
                                             </div>
 
-                                            <h4 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', lineHeight: 1.4 }}>
-                                                {question.q}
-                                            </h4>
-
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                                                {['Energy production (ATP)', 'Protein synthesis', 'Cell division', 'DNA replication'].map((opt, oidx) => (
-                                                    <div key={oidx} style={{
-                                                        padding: '0.625rem 0.875rem',
-                                                        background: 'white',
-                                                        border: '1px solid #E5E7EB',
-                                                        borderRadius: '8px',
-                                                        fontSize: '0.875rem',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '0.5rem',
-                                                    }}>
+                                            {/* Expanded Options */}
+                                            <AnimatePresence>
+                                                {expandedQuestion === idx && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: 'auto', opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                                                        style={{ overflow: 'hidden' }}
+                                                    >
                                                         <div style={{
-                                                            width: '18px',
-                                                            height: '18px',
-                                                            borderRadius: '50%',
-                                                            border: oidx === 0 ? '2px solid #22C55E' : '2px solid #D1D5DB',
-                                                            background: oidx === 0 ? '#22C55E' : 'transparent',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
+                                                            padding: '0 1.5rem 1.25rem',
+                                                            display: 'grid',
+                                                            gridTemplateColumns: '1fr 1fr',
+                                                            gap: '0.5rem',
                                                         }}>
-                                                            {oidx === 0 && <CheckCircle2 size={12} style={{ color: 'white' }} />}
+                                                            {question.options.map((opt, oidx) => (
+                                                                <div key={oidx} style={{
+                                                                    padding: '0.5rem 0.75rem',
+                                                                    background: oidx === 0 ? 'var(--success-muted)' : 'var(--bg-elevated)',
+                                                                    border: `1px solid ${oidx === 0 ? 'var(--success)' : 'var(--border-primary)'}`,
+                                                                    borderRadius: '4px',
+                                                                    fontSize: '0.8125rem',
+                                                                    color: oidx === 0 ? 'var(--success)' : 'var(--text-muted)',
+                                                                    fontWeight: oidx === 0 ? '600' : '400',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '0.5rem',
+                                                                }}>
+                                                                    <span style={{
+                                                                        fontSize: '0.625rem',
+                                                                        fontFamily: 'var(--font-mono)',
+                                                                        fontWeight: '700',
+                                                                        opacity: 0.6,
+                                                                    }}>
+                                                                        {String.fromCharCode(65 + oidx)}
+                                                                    </span>
+                                                                    {opt}
+                                                                </div>
+                                                            ))}
                                                         </div>
-                                                        {opt}
-                                                    </div>
-                                                ))}
-                                            </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
                                         </motion.div>
                                     ))}
                                 </div>
                             </div>
 
                             {/* Actions */}
-                            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                                <button className="btn btn-outline" style={{ flex: 1, minWidth: '180px', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                                    <Plus size={18} />
+                            <div style={{ display: 'flex', gap: '0.75rem' }}>
+                                <button className="btn btn-outline" style={{
+                                    flex: 1,
+                                    padding: '0.875rem',
+                                }}>
+                                    <Plus size={16} />
                                     Add Question
                                 </button>
                                 <button
                                     onClick={async () => {
                                         setIsGenerating(true);
-                                        // Demo questions - in production these would come from AI processing
-                                        const demoQuestions = [
-                                            {
-                                                id: 1,
-                                                text: "What is the primary role of mitochondria in a cell?",
-                                                options: ["Energy production (ATP)", "Protein synthesis", "Cell division", "DNA replication"],
-                                                correct: 0
-                                            },
-                                            {
-                                                id: 2,
-                                                text: "Which of the following describes anaerobic respiration best?",
-                                                options: ["Requires oxygen", "Occurs without oxygen", "Produces more ATP than aerobic", "Only happens in plants"],
-                                                correct: 1
-                                            },
-                                            {
-                                                id: 3,
-                                                text: "How many ATP molecules are produced in glycolysis?",
-                                                options: ["2 ATP", "4 ATP", "36 ATP", "38 ATP"],
-                                                correct: 0
-                                            }
-                                        ];
+                                        const quizQuestions = demoQuestions.map((q, i) => ({
+                                            id: i + 1,
+                                            text: q.q,
+                                            options: q.options,
+                                            correct: 0,
+                                        }));
 
                                         const title = file?.name?.replace(/\.[^/.]+$/, "") || 'Untitled Quiz';
                                         setQuizTitle(title);
 
                                         const result = await createQuiz({
                                             title,
-                                            questions: demoQuestions,
+                                            questions: quizQuestions,
                                             timeLimit: 600,
                                             teacherId: user?.id
                                         });
@@ -538,24 +557,18 @@ const QuizCreate = () => {
                                     className="btn btn-primary"
                                     style={{
                                         flex: 1,
-                                        minWidth: '180px',
-                                        padding: '1rem',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '0.5rem',
-                                        boxShadow: '0 8px 24px rgba(67, 97, 238, 0.25)',
-                                        opacity: isGenerating ? 0.7 : 1,
+                                        padding: '0.875rem',
+                                        opacity: isGenerating ? 0.6 : 1,
                                     }}
                                 >
                                     {isGenerating ? (
                                         <>
-                                            <Loader2 size={18} className="animate-spin" />
+                                            <Loader2 size={16} className="animate-spin" />
                                             Generating...
                                         </>
                                     ) : (
                                         <>
-                                            <Share2 size={18} />
+                                            <Share2 size={16} />
                                             Generate Quiz Link
                                         </>
                                     )}
@@ -565,7 +578,6 @@ const QuizCreate = () => {
                     )}
                 </AnimatePresence>
 
-                {/* Share Modal */}
                 <ShareModal
                     isOpen={showShareModal}
                     onClose={() => setShowShareModal(false)}

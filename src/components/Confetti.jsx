@@ -1,18 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const Confetti = ({ isActive = false, duration = 3000 }) => {
+const Confetti = ({ isActive = false }) => {
     if (!isActive) return null;
 
-    const colors = ['#4361EE', '#F72585', '#FFD700', '#4CC9F0', '#7209B7', '#3A0CA3'];
+    // Muted, dark-theme-appropriate palette
+    const colors = ['#4C7DFF', '#2E7D5B', '#C4841D', '#8B8F98', '#5E8CFF', '#D94452'];
 
-    const pieces = Array.from({ length: 50 }, (_, i) => ({
+    const pieces = Array.from({ length: 40 }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
         color: colors[Math.floor(Math.random() * colors.length)],
         delay: Math.random() * 0.5,
         rotation: Math.random() * 360,
-        size: Math.random() * 8 + 4,
+        size: Math.random() * 6 + 3,
     }));
 
     return (
@@ -33,12 +34,12 @@ const Confetti = ({ isActive = false, duration = 3000 }) => {
                         x: `${piece.x}vw`,
                         y: -20,
                         rotate: 0,
-                        opacity: 1,
+                        opacity: 0.8,
                     }}
                     animate={{
                         y: '110vh',
                         rotate: piece.rotation + 720,
-                        opacity: [1, 1, 0],
+                        opacity: [0.8, 0.6, 0],
                     }}
                     transition={{
                         duration: 3 + Math.random() * 2,
@@ -50,7 +51,7 @@ const Confetti = ({ isActive = false, duration = 3000 }) => {
                         width: piece.size,
                         height: piece.size * 0.6,
                         backgroundColor: piece.color,
-                        borderRadius: '2px',
+                        borderRadius: '1px',
                     }}
                 />
             ))}
